@@ -15,7 +15,6 @@ log = logging.getLogger('aria2')
 
 # for RENAME_CONTENT_FILES:
 # to rename TV episodes, content_is_episodes must be set to yes
-# to rename movies, imdb_lookup must be enabled in the same plugin
 
 class OutputAria2(object):
     def validator(self):
@@ -49,7 +48,7 @@ class OutputAria2(object):
         config.setdefault('rename_content_files', False)
         config.setdefault('content_is_episodes', False)
         config.setdefault('parse_filename', False)
-        config.setdefault('rename_template', '')
+        config.setdefault('rename_template', None)
         config.setdefault('file_exts', ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm'])
         config.setdefault('keep_parent_folders', False)
         config.setdefault('fix_year', True)
@@ -65,6 +64,8 @@ class OutputAria2(object):
             raise plugin.PluginError('dir (destination directory) is required.', log)
         if config['keep_parent_folders'] and config['aria_config']['dir'].find('{{parent_folders}}') == -1:
             raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir option to show where it goes.', log)
+        if config['rename_content_files'] == True and config['rename_template'] is None:
+            raise plugin.PluginError('When using rename_content_files, you must specify a rename_template.', log)
         try:
             baseurl = 'http://%s:%s/rpc' % (config['server'], config['port'])
             s = xmlrpclib.ServerProxy(baseurl)
@@ -181,7 +182,7 @@ class OutputAria2(object):
                         config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                         log.verbose(config['aria_config']['out'])
                     else:
-                        if 'name' not in entry and 'movie_name' not in entry:
+                        if ('name' not in entry and config['rename_template'].find('name') > -1) or ('movie_name' not in entry and config['rename_template'].find('movie_name') > -1):
                             raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this task to assist.' % curFile, log)
                         else:
                             config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
