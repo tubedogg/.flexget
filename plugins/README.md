@@ -13,10 +13,12 @@ Available configuration parameters:
 |rename_content_files|No|No|Change the names of the downloaded files. Not this does NOT change the filenames on the server or in torrents!|
 |content_is_episodes|No|No|If ```rename_content_files``` is enabled, choose whether the filenames on the server are to be parsed as episodes (meaning have a series name and series ID/episode number). If set to false, they are assumed to be movies or other non-episodic content. This must be set to Yes if you are using ```{{series_name}}``` or ```{{series_id}}``` in your ```rename_template````.|
 |parse_filename|No|No|Run the filename through SeriesParser or MovieParser prior to outputting it. If you wish to use ```{{series_name}}```/```{{series_id}}``` or ```{{movie_name}}```/```{{name}}``` in your ```rename_template``` and your input plugin does not set these fields, this must be set to Yes.|
-|file_exts|['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']|No|Extensions of files to exclude as "non-content". The default is intended for video files; this could be expanded to include subtitle files, if you want those. Only has an effect if ```exclude_non_content``` or ```rename_content_files``` is enabled.|
+|file_exts|see below*|No|Extensions of files to exclude as "non-content". The default is intended for video files; this could be expanded to include subtitle files, if you want those. Only has an effect if ```exclude_non_content``` or ```rename_content_files``` is enabled. Must be a comma-separated list enclosed by brackets.|
 |keep_parent_folders|No|No|If your torrent or other input has a directory structure, such as MyTorrentName/Sample/Sample.mkv and you want to keep that structure when downloading, set this to Yes.|
 |fix_year|Yes|No|If the last four characters of a TV show's name are numbers, add parentheses around them in the output filename, since it is most likely a differentiating year. Only has an effect if ```parse_filename``` and ```rename_content_files``` are both enabled.|
 |aria_config|N/A|Yes|This is the "parent folder" of any parameters that should get passed to aria2. Any [command line option](http://aria2.sourceforge.net/manual/en/html/aria2c.html#options) available in aria2 can be used by removing the two dashes (--) in front of the command name and changing ```key=value``` to ```key: value```. See sample configuration below.|
+
+* Default for ```file_exts```: ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']
 
 ## Sample Configuration ##
 ```
