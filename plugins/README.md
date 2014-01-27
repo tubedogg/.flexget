@@ -1,6 +1,7 @@
 # aria2 #
 ## Configuration ##
 Available configuration parameters:
+
 |Name|Default|Mandatory|Description|
 |----|-------|---------|-----------|
 |server|localhost|No|Hostname or IP of the server where aria2 is running and has XML-RPC enabled.|
