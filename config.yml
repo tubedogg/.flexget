@@ -6,7 +6,9 @@ templates:
 
 ### PLEX #####################################
   myplexshows:
-    # list of shows in plex's All TV category (*not* premieres)
+    # pull a list of all shows currently in the All TV library in Plex, which excludes unwatched premieres
+    # this matches against my show watch list from BTN just in case I added something there that I'm not
+    # watching anymore (or yet?)
     configure_series:
       from:
         plex:
@@ -18,52 +20,76 @@ templates:
 
 ### ARIA2 ####################################
   aria2:
+    # base config for aria2c, the connection is for the XML-RPC API
     aria2:
       server: localhost
       port: 6800
       aria_config:
+        # any command line option can be fed by removing the -- in front and changing "key=value" to "key: value"
+        # i split each file in four streams, four total downloads and four connections per server (one server)
         max-connection-per-server: 4
         max-concurrent-downloads: 4
         split: 4
+        # don't spend time pre-allocating space
         file-allocation: none
 
   aria2_add-new_movies:
+    # add new movie files to the download queue
     aria2:
       do: add-new
+      # don't want sample files
       exclude_samples: yes
+      # don't want anything except the movie file
       exclude_non_content: yes
+      # just in case they didn't get renamed on the way in, rename them now using Plex's preferred format
       rename_content_files: yes
       rename_template: '{{movie_name}} ({{movie_year}})'
+      # destination folder on my computer. the output filename gets set in the aria2 plugin using the above template
       aria_config:
         dir: '/Volumes/Smithee/MoviesS/'
 
   aria2_add-new_tv:
+    # similar to above, just for tv shows
     aria2:
       do: add-new
       exclude_samples: yes
       exclude_non_content: yes
       rename_content_files: yes
+      # this triggers it to feed the name through flexget's parser for series name and series ID
       content_is_episodes: yes
       rename_template: "{{series_name}} - {{series_id|lower()}}"
-      aria_config:
-        dir: "/Volumes/Timon/PremieresS"
+      # no destination folder here, because it varies between shows i'm watching and premieres
 
+
+### DELUGE GENERAL ###########################
+  deluge_filter_seeding:
+    # filter to just seeding for output to aria2c
+    from_deluge:
+      filter:
+        state: seeding
+  
 
 ### DELUGE BTN ###############################
   deluge_btn:
-    # regular files
+    # settings for shows i'm watching
     deluge:
       content_filename: "{{series_name}} - {{series_id|lower}}"
       path: /media/sdh1/home/tubedogg/tor/1/btn
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn
       label: btn-1
 
   deluge_btnprem:
-    # add premieres to a separate category
+    # add premieres to a separate category so they end up in a different place on my computer, and get
+    # fed into a different Plex library
     deluge:
       content_filename: "{{series_name}} - {{series_id|lower}}"
       path: /media/sdh1/home/tubedogg/tor/1/btnprem
+      movedone: /media/sdh1/home/tubedogg/tor/2/btnprem
       label: btn-prem-1
 
+  # from here down to the next section is just shorthand for switching labels in deluge. the -1 is when
+  # it is originally downloaded, then switches to -2 while downloading, and finally -3 is downloaded
+  # (and can be removed if need be)
   deluge_btn-1:
     from_deluge:
       filter:
@@ -97,11 +123,14 @@ templates:
 
 ### DELUGE TC ################################
   deluge-tc:
+    # TC is a movie tracker, so different naming pattern
     deluge:
       content_filename: "{{movie_name}} ({{movie_year}})"
       path: /media/sdh1/home/tubedogg/tor/1/tc
+      movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
 
+  # more label stuff
   deluge-tc-1:
     from_deluge:
       filter:
@@ -120,11 +149,14 @@ templates:
 
 ### DELUGE PTP ###############################
   deluge-ptp:
+    # PTP is a movie tracker, so different naming pattern
     deluge:
       content_filename: "{{movie_name}} ({{movie_year}})"
       path: /media/sdh1/home/tubedogg/tor/1/ptp
+      movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
 
+  # more label stuff
   deluge-ptp-1:
     from_deluge:
       filter:
@@ -168,6 +200,7 @@ tasks:
           name_regexp: ^archer(\.2009)?
 
   rss_btn_other-shows:
+    # misc shows not on BTN show watch feed or necessarily in plex, but that I want to catch
     template:
       - deluge_btn
     include:
@@ -183,6 +216,8 @@ tasks:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
       - includes/trakt_premieres.yml
+    # if I used series_premiere: yes here, it would match every S01E01 in the feed and wouldn't even
+    # check against my list...bug or feature? instead, check for S01E01 manually
     if:
       - series_id != "S01E01": reject
 
@@ -193,13 +228,16 @@ tasks:
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
+    # here I can use series_premiere because I do want everything, and i'm filtering the output from there
     series_premiere:
       allow_teasers: no
     thetvdb_lookup: yes
+    # if these fields aren't present, reject, because i can't filter for them
     require_field:
       - tvdb_genres
       - tvdb_first_air_date
     if:
+      # if it didn't air first in the last 60 days it's not actually new
       - tvdb_first_air_date != None and tvdb_first_air_date < now - timedelta(days=60): reject
     regexp:
       reject:
@@ -208,12 +246,15 @@ tasks:
         - reality: {from: tvdb_genres}
         - children: {from: tvdb_genres}
         - hallmark channel: {from: tvdb_network}
+        # ^ *shudders*
         - bravo: {from: tvdb_network}
         - lifetime( movie)?: {from: tvdb_network}
 
 
 ### BTN TORRENT WATCHDIR #####################
 
+  # easy way to upload torrents i manually download, from specific folders, and still get all the magic
+  # benefits of flexget
   watchdir_btn-eps:
     template:
       - deluge_btn
@@ -247,18 +288,24 @@ tasks:
 
 ### BTN DOWNLOADS ############################
 
+  # downloads are processed through aria2
   downloads_btn:
     template:
       - deluge_btn-1
       - aria2
       - aria2_add-new_tv
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
       - includes/aria_btn_uri.yml
+    aria2:
     # removed the uri due to containing login info, but this is how it looked here
-    #aria2:
     #  uri: ftp://user:pass@myserver.com/path/to/torrents/{{filename}}
+      aria_config:
+        dir: "/Volumes/Timon/TVS"
+    # if these are not disabled, it will reject everything due to already having seen it when
+    # added to deluge originally. yes this is a hack-ish workaround
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     deluge:
@@ -269,10 +316,14 @@ tasks:
       - deluge_btn-prem-1
       - aria2
       - aria2_add-new_tv
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
       - includes/aria_btnprem_uri.yml
+    aria2:
+      aria_config:
+        dir: "/Volumes/Timon/PremieresS"
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     deluge:
@@ -281,11 +332,14 @@ tasks:
 
 ### BTN CLEANUP ##############################
 
+  # check status against aria2 to make sure they're done downloading, then relabel them in
+  # deluge and move the files to the final directory
   cleanup_downloads_btn:
     manual: yes
     template:
       - deluge_btn-2
       - aria2
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -302,6 +356,7 @@ tasks:
     template:
       - deluge_btn-prem-2
       - aria2
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -321,6 +376,7 @@ tasks:
 
 ### TC RSS ###################################
 
+  # check the TC RSS feed for movies in my movie-queue
   rss_tc_movie-queue:
     template:
       - deluge-tc
@@ -332,6 +388,7 @@ tasks:
 
 ### TC TORRENT WATCHDIR ######################
 
+  # upload torrents i manually downloaded
   watchdir_tc:
     template:
       - deluge-tc
@@ -351,11 +408,13 @@ tasks:
 
 ### TC DOWNLOADS #############################
 
+  # again processing downloads through aria2c
   downloads_tc:
     template:
       - deluge-tc-1
       - aria2
       - aria2_add-new_movies
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -369,11 +428,13 @@ tasks:
 
 ### TC CLEANUP ###############################
 
+  # and similar cleanup as seen in the BTN section
   cleanup_downloads_tc:
     manual: yes
     template:
       - deluge-tc-2
       - aria2
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -394,6 +455,7 @@ tasks:
 
 ### PTP RSS ##################################
 
+  # identical to TC except for PTP
   rss_ptp_movie-queue:
     template:
       - deluge-ptp
@@ -405,6 +467,7 @@ tasks:
 
 ### PTP TORRENT WATCHDIR #####################
 
+  # identical to TC except for PTP
   watchdir_ptp:
     template:
       - deluge-ptp
@@ -424,11 +487,13 @@ tasks:
 
 ### PTP DOWNLOADS ############################
 
+  # identical to TC except for PTP
   downloads_ptp:
     template:
       - deluge-ptp-1
       - aria2
       - aria2_add-new_movies
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -442,11 +507,13 @@ tasks:
 
 ### PTP CLEANUP ##############################
 
+  # identical to TC except for PTP
   cleanup_downloads_ptp:
     manual: yes
     template:
       - deluge-ptp-2
       - aria2
+      - deluge_filter_seeding
     include:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
@@ -465,6 +532,7 @@ tasks:
 ################# MOVIE QUEUE ################
 ##############################################
 
+  # read my trakt "Movies to Get" list and add to movie-queue in flexget
   movie_queue_from_trakt:
     include:
       - trakt_movies-to-get.yml
