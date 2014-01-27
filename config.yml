@@ -41,6 +41,7 @@ templates:
       exclude_samples: yes
       # don't want anything except the movie file
       exclude_non_content: yes
+      parse_filename: yes
       # just in case they didn't get renamed on the way in, rename them now using Plex's preferred format
       rename_content_files: yes
       rename_template: '{{movie_name}} ({{movie_year}})'
@@ -54,8 +55,9 @@ templates:
       do: add-new
       exclude_samples: yes
       exclude_non_content: yes
-      rename_content_files: yes
       # this triggers it to feed the name through flexget's parser for series name and series ID
+      parse_filename: yes
+      rename_content_files: yes
       content_is_episodes: yes
       rename_template: "{{series_name}} - {{series_id|lower()}}"
       # no destination folder here, because it varies between shows i'm watching and premieres
@@ -419,7 +421,6 @@ tasks:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
       - includes/aria_tc_uri.yml
-    imdb_lookup: yes
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     deluge:
@@ -498,7 +499,6 @@ tasks:
       - includes/deluge.yml
       - includes/deluge_seeding.yml
       - includes/aria_ptp_uri.yml
-    imdb_lookup: yes
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     deluge:

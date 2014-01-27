@@ -34,7 +34,10 @@ class OutputAria2(object):
         aria.accept('text', key='rename_template')
         aria.accept('dict', key='file_exts')
         aria.accept('boolean', key='keep_parent_folders')
+        aria.accept('boolean', key='fix_year')
+        aria.accept('boolean', key='parse_filename')
         aria_config = aria.accept('dict', key='aria_config')
+        aria_config.accept('text', key='dir')
         aria_config.accept_any_key('any')
         return root
 
@@ -45,17 +48,23 @@ class OutputAria2(object):
         config.setdefault('exclude_non_content', True)
         config.setdefault('rename_content_files', False)
         config.setdefault('content_is_episodes', False)
+        config.setdefault('parse_filename', False)
         config.setdefault('rename_template', '')
         config.setdefault('file_exts', ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm'])
-        config.setdefault('keep_parent_folders', True)
+        config.setdefault('keep_parent_folders', False)
+        config.setdefault('fix_year', True)
         return config
 
     def on_task_output(self, task, config):
         config = self.prepare_config(config)
         if 'do' not in config:
-            raise plugin.PluginError('do is required.', log)
+            raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config:
-            raise plugin.PluginError('uri is required.', log)
+            raise plugin.PluginError('uri (path to folder containing file(s) on server) is required.', log)
+        if 'dir' not in config['aria_config']:
+            raise plugin.PluginError('dir (destination directory) is required.', log)
+        if config['keep_parent_folders'] and config['aria_config']['dir'].find('{{parent_folders}}') == -1:
+            raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir option to show where it goes.', log)
         try:
             baseurl = 'http://%s:%s/rpc' % (config['server'], config['port'])
             s = xmlrpclib.ServerProxy(baseurl)
@@ -73,6 +82,7 @@ class OutputAria2(object):
 
         # loop entries
         for entry in task.accepted:
+            entry['basedir'] = config['aria_config']['dir']
             if 'aria_gid' in entry:
                 config['aria_config']['gid'] = entry['aria_gid']
             elif 'torrent_info_hash' in entry:
@@ -90,6 +100,14 @@ class OutputAria2(object):
             for curFile in entry['content_files']:
 
                 curFilename = curFile.split('/')[-1]
+                if curFile.split('/')[0] != curFilename and config['keep_parent_folders']:
+                    lastSlash = curFile.rfind('/')
+                    curPath = curFile[:lastSlash]
+                    if curPath[0:1] == '/':
+                        curPath = curPath[1:]
+                    if entry['basedir'][-1:] != '/':
+                        entry['basedir'] = entry['basedir'] + '/'
+                    entry['parent_folders'] = entry['basedir'] + curPath
 
                 fileDot = curFilename.rfind(".")
                 fileExt = curFilename[fileDot:]
@@ -113,13 +131,17 @@ class OutputAria2(object):
                     if config['exclude_non_content'] == True:
                         # don't download non-content files, like nfos - definable in file_exts
                         continue
-                elif config['rename_content_files'] == True:
+
+                if config['parse_filename']:
                     if config['content_is_episodes']:
                         metainfo_series = plugin.get_plugin_by_name('metainfo_series')
                         guess_series = metainfo_series.instance.guess_series
                         if guess_series(curFilename):
                             parser = guess_series(curFilename)
                             entry['series_name'] = parser.name
+                            # if the last four chars are numbers, REALLY good chance it's actually a year...fix it if so desired
+                            if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
+                                entry['series_name'] = entry['series_name'][0:-4] + '(' + entry['series_name'][-4:] + ')'
                             parser.data = curFilename
                             parser.parse
                             log.debug(parser.id_type)
@@ -129,14 +151,38 @@ class OutputAria2(object):
                                 entry['series_id'] = parser.episode
                             elif parser.id_type and parser.id:
                                 entry['series_id'] = parser.id
-                        if entry['series_id']:
-                            config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
-                            log.verbose(config['aria_config']['out'])
-                        elif config['rename_template'].find('series_id') > -1:
-                            raise plugin.PluginError('Unable to parse series_id and it is used in rename_template.', log)
                     else:
-                        if 'movie_name' not in entry:
-                            raise plugin.PluginError('When using rename_content_files with movies, imdb_lookup must be enabled in the task.', log)
+                        from flexget.utils.titles.movie import MovieParser
+                        parser = MovieParser()
+                        parser.data = curFile
+                        parser.parse()
+                        log.info(parser)
+                        testname = parser.name
+                        testyear = parser.year
+                        parser.data = entry['title']
+                        parser.parse()
+                        log.info(parser)
+                        if len(parser.name) > len(testname):
+                            entry['name'] = parser.name
+                            entry['movie_name'] = parser.name
+                        else:
+                            entry['name'] = testname
+                            entry['movie_name'] = testname
+                        entry['year'] = parser.year
+                        entry['movie_year'] = parser.year
+                        
+
+                if config['rename_content_files'] == True:
+                    if config['content_is_episodes']:
+                        if config['rename_template'].find('series_name') > -1 and 'series_name' not in entry:
+                            raise plugin.PluginError('Unable to parse series name and it is used in rename_template.', log)
+                        elif config['rename_template'].find('series_id') > -1 and 'series_id' not in entry:
+                            raise plugin.PluginError('Unable to parse series (episode) id and it is used in rename_template.', log)
+                        config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
+                        log.verbose(config['aria_config']['out'])
+                    else:
+                        if 'name' not in entry and 'movie_name' not in entry:
+                            raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this task to assist.' % curFile, log)
                         else:
                             config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                             log.verbose(config['aria_config']['out'])
