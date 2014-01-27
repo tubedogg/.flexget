@@ -1,0 +1,8 @@
+*.pyc
+includes/
+db-config.sqlite
+flexget.log
+flexget.log.*
+*.sqlite
+.DS_Store
+temp/

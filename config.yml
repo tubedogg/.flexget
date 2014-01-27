@@ -1,0 +1,493 @@
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$* TEMPLATES $*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+templates:
+
+
+### PLEX #####################################
+  myplexshows:
+    # list of shows in plex's All TV category (*not* premieres)
+    configure_series:
+      from:
+        plex:
+          section: 10
+          server: 127.0.0.1
+          port: 32400
+          strip_year: no
+
+
+### ARIA2 ####################################
+  aria2:
+    aria2:
+      server: localhost
+      port: 6800
+      aria_config:
+        max-connection-per-server: 4
+        max-concurrent-downloads: 4
+        split: 4
+        file-allocation: none
+
+  aria2_add-new_movies:
+    aria2:
+      do: add-new
+      exclude_samples: yes
+      exclude_non_content: yes
+      rename_content_files: yes
+      rename_template: '{{movie_name}} ({{movie_year}})'
+      aria_config:
+        dir: '/Volumes/Smithee/MoviesS/'
+
+  aria2_add-new_tv:
+    aria2:
+      do: add-new
+      exclude_samples: yes
+      exclude_non_content: yes
+      rename_content_files: yes
+      content_is_episodes: yes
+      rename_template: "{{series_name}} - {{series_id|lower()}}"
+      aria_config:
+        dir: "/Volumes/Timon/PremieresS"
+
+
+### DELUGE BTN ###############################
+  deluge_btn:
+    # regular files
+    deluge:
+      content_filename: "{{series_name}} - {{series_id|lower}}"
+      path: /media/sdh1/home/tubedogg/tor/1/btn
+      label: btn-1
+
+  deluge_btnprem:
+    # add premieres to a separate category
+    deluge:
+      content_filename: "{{series_name}} - {{series_id|lower}}"
+      path: /media/sdh1/home/tubedogg/tor/1/btnprem
+      label: btn-prem-1
+
+  deluge_btn-1:
+    from_deluge:
+      filter:
+        label: btn-1
+
+  deluge_btn-prem-1:
+    from_deluge:
+      filter:
+        label: btn-prem-1
+
+  deluge_btn-2:
+    from_deluge:
+      filter:
+        label: btn-2
+
+  deluge_btn-prem-2:
+    from_deluge:
+      filter:
+        label: btn-prem-2
+
+  deluge_btn-3:
+    from_deluge:
+      filter:
+        label: btn-3
+
+  deluge_btn-prem-3:
+    from_deluge:
+      filter:
+        label: btn-prem-3
+
+
+### DELUGE TC ################################
+  deluge-tc:
+    deluge:
+      content_filename: "{{movie_name}} ({{movie_year}})"
+      path: /media/sdh1/home/tubedogg/tor/1/tc
+      label: tc-1
+
+  deluge-tc-1:
+    from_deluge:
+      filter:
+        label: tc-1
+
+  deluge-tc-2:
+    from_deluge:
+      filter:
+        label: tc-2
+
+  deluge-tc-3:
+    from_deluge:
+      filter:
+        label: tc-3
+
+
+### DELUGE PTP ###############################
+  deluge-ptp:
+    deluge:
+      content_filename: "{{movie_name}} ({{movie_year}})"
+      path: /media/sdh1/home/tubedogg/tor/1/ptp
+      label: ptp-1
+
+  deluge-ptp-1:
+    from_deluge:
+      filter:
+        label: ptp-1
+
+  deluge-ptp-2:
+    from_deluge:
+      filter:
+        label: ptp-2
+
+  deluge-ptp-3:
+    from_deluge:
+      filter:
+        label: ptp-3
+
+
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$*$* TASKS $*$*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+tasks:
+
+##############################################
+################### TV/BTN ###################
+##############################################
+
+### BTN RSS ##################################
+  rss_btn_my-shows:
+    # shows i watch based on plex, matching against my custom show watch feed from BTN
+    template:
+      - myplexshows
+      - deluge_btn
+    include:
+      - includes/btn_rss_my-shows.yml
+      - includes/deluge.yml
+      - shows.yml
+    series:
+      # fix these two series which don't seem to want to match
+      - Marvels Agents of SHIELD:
+          name_regexp: ^marvel(')?s.agents.of.(s.h.i.e.l.d.?|shield)
+      - Archer:
+          name_regexp: ^archer(\.2009)?
+
+  rss_btn_other-shows:
+    template:
+      - deluge_btn
+    include:
+      - includes/btn_rss_720p-mkv.yml
+      - includes/deluge.yml
+      - shows.yml
+
+  rss_btn_my-premieres:
+    # premieres I am waiting for, based on my Trakt list premieres, matching against the BTN MKV 720p feed
+    template:
+      - deluge_btnprem
+    include:
+      - includes/btn_rss_720p-mkv.yml
+      - includes/deluge.yml
+      - includes/trakt_premieres.yml
+    if:
+      - series_id != "S01E01": reject
+
+  rss_btn_all-premieres:
+    # all premieres that come across, except for certain categories, matching against the BTN MKV 720p feed
+    template:
+      - deluge_btnprem
+    include:
+      - includes/btn_rss_720p-mkv.yml
+      - includes/deluge.yml
+    series_premiere:
+      allow_teasers: no
+    thetvdb_lookup: yes
+    require_field:
+      - tvdb_genres
+      - tvdb_first_air_date
+    if:
+      - tvdb_first_air_date != None and tvdb_first_air_date < now - timedelta(days=60): reject
+    regexp:
+      reject:
+        - talk show: {from: tvdb_genres}
+        - game show: {from: tvdb_genres}
+        - reality: {from: tvdb_genres}
+        - children: {from: tvdb_genres}
+        - hallmark channel: {from: tvdb_network}
+        - bravo: {from: tvdb_network}
+        - lifetime( movie)?: {from: tvdb_network}
+
+
+### BTN TORRENT WATCHDIR #####################
+
+  watchdir_btn-eps:
+    template:
+      - deluge_btn
+    include:
+      - includes/deluge.yml
+    find:
+      path: ~/Torrents/btn
+      mask: '*.torrent'
+    all_series: yes
+
+  watchdir_btn-seasons:
+    template:
+      - deluge_btn
+    include:
+      - includes/deluge.yml
+    find:
+      path: ~/Torrents/btn
+      mask: '*.torrent'
+    accept_all: yes
+
+  watchdir_btnprem:
+    template:
+      - deluge_btnprem
+    include:
+      - includes/deluge.yml
+    find:
+      path: ~/Torrents/btnprem
+      mask: '*.torrent'
+    accept_all: yes
+
+
+### BTN DOWNLOADS ############################
+
+  downloads_btn:
+    template:
+      - deluge_btn-1
+      - aria2
+      - aria2_add-new_tv
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+      - includes/aria_btn_uri.yml
+    # removed the uri due to containing login info, but this is how it looked here
+    #aria2:
+    #  uri: ftp://user:pass@myserver.com/path/to/torrents/{{filename}}
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    deluge:
+      label: btn-2
+
+  downloads_btnprem:
+    template:
+      - deluge_btn-prem-1
+      - aria2
+      - aria2_add-new_tv
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+      - includes/aria_btnprem_uri.yml
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    deluge:
+      label: btn-prem-2
+
+
+### BTN CLEANUP ##############################
+
+  cleanup_downloads_btn:
+    manual: yes
+    template:
+      - deluge_btn-2
+      - aria2
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    aria2:
+      do: remove-completed
+    deluge:
+      path: /media/sdh1/home/tubedogg/tor/3/btn
+      label: btn-3
+
+  cleanup_downloads_btnprem:
+    manual: yes
+    template:
+      - deluge_btn-prem-2
+      - aria2
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    aria2:
+      do: remove-completed
+    deluge:
+      path: /media/sdh1/home/tubedogg/tor/3/btnprem
+      label: btn-prem-3
+
+
+
+##############################################
+################## MOVIES/TC #################
+##############################################
+
+### TC RSS ###################################
+
+  rss_tc_movie-queue:
+    template:
+      - deluge-tc
+    include:
+      - includes/deluge.yml
+      - includes/tc_rss.yml
+    movie_queue: yes
+
+
+### TC TORRENT WATCHDIR ######################
+
+  watchdir_tc:
+    template:
+      - deluge-tc
+    include:
+      - includes/deluge.yml
+    find:
+      path: ~/Torrents/tc
+      mask: '*.torrent'
+    set:
+      title: '{{movie_name}} ({{movie_year}})'
+    imdb_lookup: yes
+    accept_all: yes
+    movie_queue: yes
+    move:
+      to: "~/Torrents/_done"
+
+
+### TC DOWNLOADS #############################
+
+  downloads_tc:
+    template:
+      - deluge-tc-1
+      - aria2
+      - aria2_add-new_movies
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+      - includes/aria_tc_uri.yml
+    imdb_lookup: yes
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    deluge:
+      label: tc-2
+
+
+### TC CLEANUP ###############################
+
+  cleanup_downloads_tc:
+    manual: yes
+    template:
+      - deluge-tc-2
+      - aria2
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    aria2:
+      do: remove-completed
+      exclude_samples: yes
+      exclude_non_content: yes
+    deluge:
+      path: /media/sdh1/home/tubedogg/tor/3/tc
+      label: tc-3
+
+
+##############################################
+################# MOVIES/PTP #################
+##############################################
+
+### PTP RSS ##################################
+
+  rss_ptp_movie-queue:
+    template:
+      - deluge-ptp
+    include:
+      - includes/deluge.yml
+      - includes/ptp_rss.yml
+    movie_queue: yes
+
+
+### PTP TORRENT WATCHDIR #####################
+
+  watchdir_ptp:
+    template:
+      - deluge-ptp
+    include:
+      - includes/deluge.yml
+    find:
+      path: ~/Torrents/ptp
+      mask: '*.torrent'
+    set:
+      title: '{{movie_name}} ({{movie_year}})'
+    imdb_lookup: yes
+    accept_all: yes
+    movie_queue: yes
+    move:
+      to: "~/Torrents/_done"
+
+
+### PTP DOWNLOADS ############################
+
+  downloads_ptp:
+    template:
+      - deluge-ptp-1
+      - aria2
+      - aria2_add-new_movies
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+      - includes/aria_ptp_uri.yml
+    imdb_lookup: yes
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    deluge:
+      label: ptp-2
+
+
+### PTP CLEANUP ##############################
+
+  cleanup_downloads_ptp:
+    manual: yes
+    template:
+      - deluge-ptp-2
+      - aria2
+    include:
+      - includes/deluge.yml
+      - includes/deluge_seeding.yml
+    disable_builtins: [seen_info_hash, seen]
+    accept_all: yes
+    aria2:
+      do: remove-completed
+      exclude_samples: yes
+      exclude_non_content: yes
+    deluge:
+      path: /media/sdh1/home/tubedogg/tor/3/ptp
+      label: tc-3
+
+
+##############################################
+################# MOVIE QUEUE ################
+##############################################
+
+  movie_queue_from_trakt:
+    include:
+      - trakt_movies-to-get.yml
+    accept_all: yes
+    queue_movies:
+      quality: 720p+ bluray
+
+
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$* SCHEDULES $*$*$*$*$*$*$*$*$#
+#$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
+schedules:
+
+  - tasks: ['rss_btn*', 'rss_tc*']
+    interval:
+      days: 1
+      at_time: 1:00 am
+  - tasks: ['download*btn*']
+    interval:
+      hours: 6
+  - tasks: ['download*tc']
+    interval:
+      days: 1
+  - tasks: ['movie_queue_from_trakt']
+    interval:
+      days: 2
