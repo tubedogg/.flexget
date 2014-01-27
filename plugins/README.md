@@ -1,5 +1,5 @@
-# aria2 #
-## Configuration ##
+## aria2 ##
+### Configuration ###
 Available configuration parameters:
 
 |Name|Default|Mandatory|Description|
@@ -20,7 +20,7 @@ Available configuration parameters:
 
 * Default for ```file_exts```: ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']
 
-## Sample Configuration ##
+### Sample Configuration ###
 ```
   aria2:
     server: myserver
