@@ -21,7 +21,8 @@ series:
       name_regexp: ^american.dad(!)?
   - Family Guy
   - Hannibal
-  - Once Upon a Time
+  - Once Upon a Time:
+      exact: yes
   - Once Upon a Time in Wonderland
   - Ground Floor
   - Getting On US:

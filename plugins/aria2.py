@@ -47,6 +47,7 @@ class OutputAria2(object):
     }
 
     def on_task_output(self, task, config):
+        log.info(config['file_exts'])
         if 'do' not in config:
             raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config and config['do'] == 'add-new':
