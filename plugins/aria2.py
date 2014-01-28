@@ -43,7 +43,7 @@ class OutputAria2(object):
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
             }
         },
-        'additionalProperties': {'type': 'string'}
+        'additionalProperties': False
     }
 
     def on_task_output(self, task, config):
