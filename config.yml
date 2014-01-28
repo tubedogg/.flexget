@@ -262,28 +262,9 @@ tasks:
 ### BTN RSS ############################################################
 
   rss_btn_my-shows:
-    # shows i watch based on plex, matching against my custom show watch
-    # feed from BTN
+    # my list of active shows
     template:
-      - myplexshows
-      - deluge_btn
-      - deluge_content_tv
-      - fix-year
-    include:
-      - includes/btn_rss_my-shows.yml
-      - includes/deluge.yml
-      - shows.yml
-    series:
-      # fix these two series which don't seem to want to match
-      - Marvels Agents of SHIELD:
-          name_regexp: ^marvel(')?s.agents.of.(s.h.i.e.l.d.?|shield)
-      - Archer:
-          name_regexp: ^archer(\.2009)?
-
-  rss_btn_other-shows:
-    # misc shows not on BTN show watch feed or necessarily in plex, but
-    # that I want to catch
-    template:
+    #  - myplexshows
       - deluge_btn
       - deluge_content_tv
       - fix-year
@@ -291,6 +272,17 @@ tasks:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
       - shows.yml
+
+  rss_btn_other-shows:
+    # misc shows not necessarily in plex, but that I want to catch
+    template:
+      - deluge_btn
+      - deluge_content_tv
+      - fix-year
+    include:
+      - includes/btn_rss_720p-mkv.yml
+      - includes/deluge.yml
+      - misc-shows.yml
 
   rss_btn_my-premieres:
     # premieres I am waiting for, based on my Trakt list premieres,
