@@ -60,7 +60,7 @@ class OutputAria2(object):
             raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config and config['do'] == 'add-new':
             raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new downloads.', log)
-        if 'dir' not in config['aria_config']:
+        if 'dir' not in config['aria_config'] and config['do'] == 'add-new':
             raise plugin.PluginError('dir (destination directory) is required.', log)
         if config['keep_parent_folders'] and config['aria_config']['dir'].find('{{parent_folders}}') == -1:
             raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir option to show where it goes.', log)
