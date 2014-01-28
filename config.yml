@@ -175,6 +175,14 @@ templates:
         label: ptp-3
 
 
+  fix-year:
+    manipulate:
+      - series_name:
+          phase: filter
+          replace:
+            regexp: '(.*)(\d{4})'
+            format: '\1(\2)'
+
 #$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
 #$*$*$*$*$*$*$*$*$* TASKS $*$*$*$*$*$*$*$*$*$#
 #$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$#
@@ -190,6 +198,7 @@ tasks:
     template:
       - myplexshows
       - deluge_btn
+      - fix-year
     include:
       - includes/btn_rss_my-shows.yml
       - includes/deluge.yml
@@ -205,6 +214,7 @@ tasks:
     # misc shows not on BTN show watch feed or necessarily in plex, but that I want to catch
     template:
       - deluge_btn
+      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -214,6 +224,7 @@ tasks:
     # premieres I am waiting for, based on my Trakt list premieres, matching against the BTN MKV 720p feed
     template:
       - deluge_btnprem
+      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -227,6 +238,7 @@ tasks:
     # all premieres that come across, except for certain categories, matching against the BTN MKV 720p feed
     template:
       - deluge_btnprem
+      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -260,6 +272,7 @@ tasks:
   watchdir_btn-eps:
     template:
       - deluge_btn
+      - fix-year
     include:
       - includes/deluge.yml
     find:
@@ -280,6 +293,7 @@ tasks:
   watchdir_btnprem:
     template:
       - deluge_btnprem
+      - fix-year
     include:
       - includes/deluge.yml
     find:
