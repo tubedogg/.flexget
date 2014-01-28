@@ -236,20 +236,6 @@ templates:
         label: ptp-3
 
 
-### MISC ###############################################################
-
-  fix-year:
-    # if the last four chars of the series_name are numbers, REALLY good
-    # chance it's a year to differentiate between different shows with
-    # the same name. i want those in parentheses
-    manipulate:
-      - series_name:
-          phase: filter
-          replace:
-            regexp: '(.*)(\d{4})'
-            format: '\1(\2)'
-
-
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$* TASKS $*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
@@ -267,7 +253,6 @@ tasks:
     #  - myplexshows
       - deluge_btn
       - deluge_content_tv
-      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -278,7 +263,6 @@ tasks:
     template:
       - deluge_btn
       - deluge_content_tv
-      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -290,7 +274,6 @@ tasks:
     template:
       - deluge_btnprem
       - deluge_content_tv
-      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -307,7 +290,6 @@ tasks:
     template:
       - deluge_btnprem
       - deluge_content_tv
-      - fix-year
     include:
       - includes/btn_rss_720p-mkv.yml
       - includes/deluge.yml
@@ -344,7 +326,6 @@ tasks:
     template:
       - deluge_btn
       - deluge_content_tv
-      - fix-year
     include:
       - includes/deluge.yml
     find:
@@ -367,7 +348,6 @@ tasks:
     template:
       - deluge_btnprem
       - deluge_content_tv
-      - fix-year
     include:
       - includes/deluge.yml
     find:
@@ -472,7 +452,6 @@ tasks:
     template:
       - deluge_tvt
       - deluge_content_tv
-      - fix-year
     include:
       - includes/deluge.yml
     find:
@@ -540,7 +519,6 @@ tasks:
     template:
       - deluge_tvv
       - deluge_content_tv
-      - fix-year
     include:
       - includes/deluge.yml
     find:

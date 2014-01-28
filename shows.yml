@@ -4,15 +4,15 @@ series:
   - Hot in Cleveland
   - Glee
   - Friday Night Dinner
-  - The Americans:
+  - The Americans 2013:
       name_regexp: ^the\.americans(\.2013)?
   - Episodes
   - Sleepy Hollow
   - Robot Chicken
   - Modern Family
-  - Archer:
+  - Archer 2009:
       name_regexp: ^archer(\.2009)?
-  - The Newsroom (2012):
+  - The Newsroom 2012:
       name_regexp: ^the\.newsroom(\.2012)?
   - How I Met Your Mother
   - The Middle
@@ -43,7 +43,7 @@ series:
       name_regexp: ^marvel(')?s.agents.of.(s.h.i.e.l.d.?|shield)
   - The Tomorrow People US:
       exact: yes
-  - Hawaii Five-0:
+  - Hawaii Five-0 2010:
       name_regexp: ^hawaii\.five-0(\.2010)?
   - Arrow
   - The Blacklist
@@ -62,7 +62,7 @@ series:
   - Raising Hope
   - Helix
   - In The Flesh
-  - Revolution:
+  - Revolution 2012:
       name_regexp: ^revolution(\.2012)?
   - Chozen
   - The Musketeers
