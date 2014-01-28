@@ -17,55 +17,49 @@ log = logging.getLogger('aria2')
 # to rename TV episodes, content_is_episodes must be set to yes
 
 class OutputAria2(object):
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        aria = root.accept('dict')
-        aria.accept('text', key='server')
-        aria.accept('integer', key='port')
-        aria.accept('choice', key='do').accept_choices(['add-new', 'remove-completed'], ignore_case=True)
-        aria.accept('text', key='uri')
-        aria.accept('boolean', key='exclude_samples')
-        aria.accept('boolean', key='exclude_non_content')
-        aria.accept('boolean', key='rename_content_files')
-        aria.accept('boolean', key='content_is_episodes')
-        aria.accept('text', key='rename_template')
-        aria.accept('dict', key='file_exts')
-        aria.accept('boolean', key='keep_parent_folders')
-        aria.accept('boolean', key='fix_year')
-        aria.accept('boolean', key='parse_filename')
-        aria_config = aria.accept('dict', key='aria_config')
-        aria_config.accept('text', key='dir')
-        aria_config.accept_any_key('any')
-        return root
 
-    def prepare_config(self, config):
-        config.setdefault('server', 'localhost')
-        config.setdefault('port', 6800)
-        config.setdefault('exclude_samples', False)
-        config.setdefault('exclude_non_content', True)
-        config.setdefault('rename_content_files', False)
-        config.setdefault('content_is_episodes', False)
-        config.setdefault('parse_filename', False)
-        config.setdefault('rename_template', None)
-        config.setdefault('file_exts', ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm'])
-        config.setdefault('keep_parent_folders', False)
-        config.setdefault('fix_year', True)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'server': {'type': 'string', 'default': 'localhost'},
+            'port': {'type': 'integer', 'default': 6800},
+            'do': {'type': 'string', 'enum': ['add-new', 'remove-completed']},
+            'uri': {'type': 'string'},
+            'exclude_samples': {'type': 'boolean', 'default': False},
+            'exclude_non_content': {'type': 'boolean', 'default': True},
+            'rename_content_files': {'type': 'boolean', 'default': False},
+            'content_is_episodes': {'type': 'boolean', 'default': False},
+            'keep_parent_folders': {'type': 'boolean', 'default': False},
+            'parse_filename': {'type': 'boolean', 'default': False},
+            'fix_year': {'type': 'boolean', 'default': True},
+            'rename_template': {'type': 'string', 'default': ''},
+            'file_exts': {
+                'type': 'array',
+                'items': {'type': 'string'},
+                'default': ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']
+            },
+            'aria_config': {
+                'type': 'object',
+                'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
+            }
+        },
+        'additionalProperties': {'type': 'string'}
+    }
 
     def on_task_output(self, task, config):
-        config = self.prepare_config(config)
         if 'do' not in config:
             raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config and config['do'] == 'add-new':
-            raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new downloads.', log)
+            raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new '
+                                     'downloads.', log)
         if 'dir' not in config['aria_config'] and config['do'] == 'add-new':
             raise plugin.PluginError('dir (destination directory) is required.', log)
         if config['keep_parent_folders'] and config['aria_config']['dir'].find('{{parent_folders}}') == -1:
-            raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir option to show where it goes.', log)
-        if config['rename_content_files'] == True and config['rename_template'] is None:
+            raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir '
+                                     'option to show where it goes.', log)
+        if config['rename_content_files'] == True and config['rename_template'] == '':
             raise plugin.PluginError('When using rename_content_files, you must specify a rename_template.', log)
+
         try:
             baseurl = 'http://%s:%s/rpc' % (config['server'], config['port'])
             s = xmlrpclib.ServerProxy(baseurl)
@@ -140,14 +134,16 @@ class OutputAria2(object):
                         if guess_series(curFilename):
                             parser = guess_series(curFilename)
                             entry['series_name'] = parser.name
-                            # if the last four chars are numbers, REALLY good chance it's actually a year...fix it if so desired
+                            # if the last four chars are numbers, REALLY good chance it's actually a year...
+                            #fix it if so desired
                             if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
-                                entry['series_name'] = entry['series_name'][0:-4] + '(' + entry['series_name'][-4:] + ')'
+                                entry['series_name'] = entry['series_name'][0:-4] +'('+ entry['series_name'][-4:] + ')'
                             parser.data = curFilename
                             parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
-                                entry['series_id'] = 'S' + str(parser.season).rjust(2, str('0')) + 'E' + str(parser.episode).rjust(2, str('0'))
+                                entry['series_id'] = 'S' + str(parser.season).rjust(2, str('0')) + 'E'
+                                entry['series_id'] += str(parser.episode).rjust(2, str('0'))
                             elif parser.id_type == 'sequence':
                                 entry['series_id'] = parser.episode
                             elif parser.id_type and parser.id:
@@ -176,14 +172,16 @@ class OutputAria2(object):
                 if config['rename_content_files'] == True:
                     if config['content_is_episodes']:
                         if config['rename_template'].find('series_name') > -1 and 'series_name' not in entry:
-                            raise plugin.PluginError('Unable to parse series name and it is used in rename_template.', log)
+                            raise plugin.PluginError('Unable to parse series_name and used in rename_template.', log)
                         elif config['rename_template'].find('series_id') > -1 and 'series_id' not in entry:
-                            raise plugin.PluginError('Unable to parse series (episode) id and it is used in rename_template.', log)
+                            raise plugin.PluginError('Unable to parse series id and used in rename_template.', log)
                         config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                         log.verbose(config['aria_config']['out'])
                     else:
-                        if ('name' not in entry and config['rename_template'].find('name') > -1) or ('movie_name' not in entry and config['rename_template'].find('movie_name') > -1):
-                            raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this task to assist.' % curFile, log)
+                        if (('name' not in entry and config['rename_template'].find('name') > -1) or
+                           ('movie_name' not in entry and config['rename_template'].find('movie_name') > -1)):
+                            raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this'
+                                                     ' task to assist.' % curFile, log)
                         else:
                             config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                             log.verbose(config['aria_config']['out'])
@@ -208,14 +206,17 @@ class OutputAria2(object):
                         if err.faultString[-12:] == 'is not found':
                             newDownload = 1
                         else:
-                            raise plugin.PluginError('aria response to download status request: %s' % err.faultString, log)
+                            raise plugin.PluginError('aria response to download status request: %s'
+                                                      % err.faultString, log)
 
                     if newDownload == 1:
                         try:
                             entry['filename'] = curFile
                             curUri = entry.render(config['uri'])
                             if not task.manager.options.test:
-                                r = s.aria2.addUri([curUri], {key: entry.render(str(value)) for (key, value) in config['aria_config'].iteritems()})
+                                r = s.aria2.addUri([curUri], {
+                                        key: entry.render(str(value)) for (key, value) in config['aria_config'].iteritems()
+                                    })
                             else:
                                 if config['aria_config']['gid'] == '':
                                     r = '1234567890123456'
@@ -238,12 +239,15 @@ class OutputAria2(object):
                                     if a == 'OK':
                                         log.info('Download with gid %s removed from memory' % r['gid'])
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria response to remove request: %s' % err.faultString, log)
+                                    raise plugin.PluginError('aria response to remove request: %s'
+                                                              % err.faultString, log)
                         else:
-                            log.info('Download with gid %s could not be removed because of its status: %s' % (r['gid'], r['status']))
+                            log.info('Download with gid %s could not be removed because of its status: %s'
+                                      % (r['gid'], r['status']))
                     except xmlrpclib.Fault as err:
                         if err.faultString[-12:] == 'is not found':
-                            log.warning('Download with gid %s could not be removed because it was not found. It was possibly previously removed or never added.' % config['aria_config']['gid'])
+                            log.warning('Download with gid %s could not be removed because it was not found. It was '
+                                        'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
                             raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
 
