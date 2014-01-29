@@ -1,69 +1,69 @@
-series:
-  - The Big Bang Theory
-  - Parks and Recreation
-  - Hot in Cleveland
-  - Glee
-  - Friday Night Dinner
-  - The Americans 2013:
-      name_regexp: ^the\.americans(\.2013)?
-  - Episodes
-  - Sleepy Hollow
-  - Robot Chicken
-  - Modern Family
-  - Archer 2009:
-      name_regexp: ^archer(\.2009)?
-  - The Newsroom 2012:
-      name_regexp: ^the\.newsroom(\.2012)?
-  - How I Met Your Mother
-  - The Middle
-  - Elementary
-  - American Dad:
-      name_regexp: ^american.dad(!)?
-  - Family Guy
-  - Hannibal
-  - Once Upon a Time:
-      exact: yes
-  - Once Upon a Time in Wonderland
-  - Ground Floor
-  - Getting On US:
-      exact: yes
-  - New Girl
-  - American Horror Story
-  - The Crazy Ones
-  - Sean Saves the World
-  - The Millers
-  - Homeland
-  - Mom
-  - Bates Motel
-  - Da Vinci's Demons
-  - Fresh Meat
-  - Brooklyn Nine-Nine
-  - 2 Broke Girls
-  - Marvel's Agents of S.H.I.E.L.D.:
-      name_regexp: ^marvel(')?s.agents.of.(s.h.i.e.l.d.?|shield)
-  - The Tomorrow People US:
-      exact: yes
-  - Hawaii Five-0 2010:
-      name_regexp: ^hawaii\.five-0(\.2010)?
-  - Arrow
-  - The Blacklist
-  - The Mindy Project
-  - The Michael J. Fox Show
-  - Kirstie
-  - How the Earth Works
-  - How to Build a Planet
-  - Ray Donovan
-  - Rectify
-  - Utopia
-  - The Exes
-  - Republic of Doyle
-  - Looking
-  - Black Sails
-  - Raising Hope
-  - Helix
-  - In The Flesh
-  - Revolution 2012:
-      name_regexp: ^revolution(\.2012)?
-  - Chozen
-  - The Musketeers
-  - MythBusters
+    series:
+      - The Big Bang Theory
+      - Parks and Recreation
+      - Hot in Cleveland
+      - Glee
+      - Friday Night Dinner
+      - The Americans 2013:
+          name_regexp: ^the\.americans(\.2013)?
+      - Episodes
+      - Sleepy Hollow
+      - Robot Chicken
+      - Modern Family
+      - Archer 2009:
+          name_regexp: ^archer(\.2009)?
+      - The Newsroom 2012:
+          name_regexp: ^the\.newsroom(\.2012)?
+      - How I Met Your Mother
+      - The Middle
+      - Elementary
+      - American Dad:
+          name_regexp: ^american.dad(!)?
+      - Family Guy
+      - Hannibal
+      - Once Upon a Time:
+          exact: yes
+      - Once Upon a Time in Wonderland
+      - Ground Floor
+      - Getting On US:
+          exact: yes
+      - New Girl
+      - American Horror Story
+      - The Crazy Ones
+      - Sean Saves the World
+      - The Millers
+      - Homeland
+      - Mom
+      - Bates Motel
+      - Da Vinci's Demons
+      - Fresh Meat
+      - Brooklyn Nine-Nine
+      - 2 Broke Girls
+      - Marvel's Agents of S.H.I.E.L.D.:
+          name_regexp: ^marvel(')?s.agents.of.(s.h.i.e.l.d.?|shield)
+      - The Tomorrow People US:
+          exact: yes
+      - Hawaii Five-0 2010:
+          name_regexp: ^hawaii\.five-0(\.2010)?
+      - Arrow
+      - The Blacklist
+      - The Mindy Project
+      - The Michael J. Fox Show
+      - Kirstie
+      - How the Earth Works
+      - How to Build a Planet
+      - Ray Donovan
+      - Rectify
+      - Utopia
+      - The Exes
+      - Republic of Doyle
+      - Looking
+      - Black Sails
+      - Raising Hope
+      - Helix
+      - In The Flesh
+      - Revolution 2012:
+          name_regexp: ^revolution(\.2012)?
+      - Chozen
+      - The Musketeers
+      - MythBusters

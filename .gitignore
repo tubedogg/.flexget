@@ -6,3 +6,5 @@ flexget.log.*
 *.sqlite
 .DS_Store
 temp/
+*.sh
+.ignore/
