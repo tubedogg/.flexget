@@ -47,7 +47,6 @@ class OutputAria2(object):
     }
 
     def on_task_output(self, task, config):
-        log.info(config['file_exts'])
         if 'do' not in config:
             raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config and config['do'] == 'add-new':
@@ -137,8 +136,10 @@ class OutputAria2(object):
                             entry['series_name'] = parser.name
                             # if the last four chars are numbers, REALLY good chance it's actually a year...
                             #fix it if so desired
+                            log.verbose(entry['series_name'])
                             if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
                                 entry['series_name'] = entry['series_name'][0:-4] +'('+ entry['series_name'][-4:] + ')'
+                                log.verbose(entry['series_name'])
                             parser.data = curFilename
                             parser.parse
                             log.debug(parser.id_type)
