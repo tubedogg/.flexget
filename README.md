@@ -3,7 +3,7 @@ FlexgetConfig
 
 Configuration for Flexget
 
-Note that all sensitive info (RSS feed URLs, deluge auth, etc.) has been moved into the includes/ directory which will not be committed. Rest assured, though, that these are standard uses of the deluge, from_deluge and rss plugins.
+Note that all sensitive info (RSS feed URLs, deluge auth, etc.) has either been scrubbed using .gitattributes or has been moved into separate files in an includes/ directory (which will not be committed). The only things not visible in the config file are a standard use of the ```rss``` plugin (```rss: http://tracker.example.com/rss.feed```) and two instances of the ```from_trakt``` plugin to retrieve custom lists from [trakt.tv](http://trakt.tv).
 
 aria2 Plugin
 ============
