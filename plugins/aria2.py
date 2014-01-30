@@ -23,6 +23,8 @@ class OutputAria2(object):
         'properties': {
             'server': {'type': 'string', 'default': 'localhost'},
             'port': {'type': 'integer', 'default': 6800},
+            'username': {'type': 'string', 'default': ''},
+            'password': {'type': 'string', 'default': ''},
             'do': {'type': 'string', 'enum': ['add-new', 'remove-completed']},
             'uri': {'type': 'string'},
             'exclude_samples': {'type': 'boolean', 'default': False},
@@ -42,13 +44,13 @@ class OutputAria2(object):
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
             }
+            
         },
+        'required': ['do', 'server', 'port'],
         'additionalProperties': False
     }
 
     def on_task_output(self, task, config):
-        if 'do' not in config:
-            raise plugin.PluginError('do (action to complete) is required.', log)
         if 'uri' not in config and config['do'] == 'add-new':
             raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new '
                                      'downloads.', log)
@@ -59,20 +61,26 @@ class OutputAria2(object):
                                      'option to show where it goes.', log)
         if config['rename_content_files'] == True and config['rename_template'] == '':
             raise plugin.PluginError('When using rename_content_files, you must specify a rename_template.', log)
+        if len(config['username']) > 0 and len(config['password']) == 0:
+            raise plugin.PluginError('If you specify an aria2 username, you must specify a password.')
 
         try:
-            baseurl = 'http://%s:%s/rpc' % (config['server'], config['port'])
+            if len(config['username']) > 0:
+                userpass = '%s:%s@' % (config['username'], config['password'])
+            else:
+                userpass = ''
+            baseurl = 'http://%s%s:%s/rpc' % (userpass, config['server'], config['port'])
+            log.debug('base url: %s' % baseurl)
             s = xmlrpclib.ServerProxy(baseurl)
             log.info('Connected to daemon at ' + baseurl + '.')
+        except xmlrpclib.ProtocolError as err:
+            raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s' % (baseurl, err.errcode, err.errmsg), log)
         except xmlrpclib.Fault as err:
-            log.error('XML-RPC fault: Unable to connect to daemon at %s: %s' % (baseurl, err.faultString))
-            plugin.PluginError('Could not connect to aria', log)
-        except IOError as err:
-            log.error('Connection issue with daemon at %s: %s' % (baseurl, err.strerror))
-            plugin.PluginError('Could not connect to aria', log)
+            raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s' % (baseurl, err.faultString), log)
         except socket.err as err:
-            log.error('Socket connection issue with daemon at %s: %s' % (baseurl, err.strerror))
-            plugin.PluginError('Could not connect to aria', log)
+            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (baseurl, err.strerror), log)
+        except:
+            raise plugin.PluginError('Unidentified error during connection to aria2 daemon at %s' % baseurl, log)
 
 
         # loop entries
@@ -210,6 +218,9 @@ class OutputAria2(object):
                         else:
                             raise plugin.PluginError('aria response to download status request: %s'
                                                       % err.faultString, log)
+                    except xmlrpclib.ProtocolError as err:
+                        raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
+                                                  % (baseurl, err.errcode, err.errmsg), log)
 
                     if newDownload == 1:
                         try:
