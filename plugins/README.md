@@ -6,6 +6,8 @@ Available configuration parameters:
 |----|-------|---------|-----------|
 |server|localhost|No|Hostname or IP of the server where aria2 is running and has XML-RPC enabled.|
 |port|6800|No|Port to connect to on the server listed above.|
+|username|N/A|No|Username used to connect to the aria2 XML-RPC server. (Corresponds to ```rpc-user``` in the aria2 config file.)|
+|password|N/A|No|Password used to connect to the aria2 XML-RPC server. (Corresponds to ```rpc-passwd``` in the aria2 config file.)
 |do|N/A|Yes|```add-new``` or ```remove-completed```. ```add-new``` passes files to aria2 to download; ```remove-completed``` removes them.|
 |uri|N/A|Yes|The base URI to pass to aria2. Include Basic Auth parameters inline. For example, ```ftp://myuser:mypass@ftp.example.com:21/path/to/directory```.|
 |exclude_samples|No|No|Whether to exclude files containing ```sample``` in their name or parent directories.|
