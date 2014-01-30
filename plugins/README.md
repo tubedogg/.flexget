@@ -8,8 +8,8 @@ Available configuration parameters:
 |port|6800|No|Port to connect to on the server listed above.|
 |username|N/A|No|Username used to connect to the aria2 XML-RPC server. (Corresponds to ```rpc-user``` in the aria2 config file.)|
 |password|N/A|No|Password used to connect to the aria2 XML-RPC server. (Corresponds to ```rpc-passwd``` in the aria2 config file.)
-|do|N/A|Yes|```add-new``` or ```remove-completed```. ```add-new``` passes files to aria2 to download; ```remove-completed``` removes them.|
-|uri|N/A|Yes|The base URI to pass to aria2. Include Basic Auth parameters inline. For example, ```ftp://myuser:mypass@ftp.example.com:21/path/to/directory```.|
+|do|N/A|Yes|```add-new``` or ```remove-completed```. ```add-new``` passes files to aria2 to download; ```remove-completed``` removes them (after verifying they are completed).|
+|uri|N/A|Yes|The base URI to pass to aria2. Include Basic Auth parameters inline, or as their corresponding aria2 commands under aria_config below. Inline example: ```ftp://myuser:mypass@ftp.example.com:21/path/to/directory/{{title}}```. Any entry fields can be included and will be parsed prior to passing to aria2.|
 |exclude_samples|No|No|Whether to exclude files containing ```sample``` in their name or parent directories.|
 |exclude_non_content|Yes|No|Whether to exclude "non-content" files; that is, anything that does not have an extension listed in ```file_exts``` (see below).|
 |rename_content_files|No|No|Change the names of the downloaded files. Not this does NOT change the filenames on the server or in torrents!|
