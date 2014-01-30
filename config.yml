@@ -5,8 +5,6 @@ templates:
 
 ### DELUGE BTN #########################################################
 
-
-
   deluge_btn:
     deluge:
       host: deluge.example.com
