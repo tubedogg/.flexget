@@ -692,8 +692,7 @@ schedules:
   # run btn one additional time per day
   - tasks: ['rss_btn*']
     interval:
-      days: 1
-      at_time: 5:00 pm
+      minutes: 10
   # start BTN downloads every 6 hours
   - tasks: ['down*btn*']
     interval:
