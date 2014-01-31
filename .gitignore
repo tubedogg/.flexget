@@ -8,3 +8,4 @@ flexget.log.*
 temp/
 *.sh
 .ignore/
+*.sqlite_*

@@ -9,8 +9,8 @@ templates:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username: deluge_user
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/btn
       movedone: /media/sdh1/home/tubedogg/tor/2/btn
       label: btn-1
@@ -20,8 +20,8 @@ templates:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username: deluge_user
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/btn-prem
       movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
       label: btn-prem-1
@@ -129,14 +129,14 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username: deluge_user
+      password: deluge_pass
       label: btn-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: btn-1
         state: seeding
@@ -167,14 +167,14 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       label: btn-prem-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: btn-prem-1
         state: seeding
@@ -213,8 +213,8 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: btn-2
         state: seeding
@@ -226,8 +226,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/btn
       label: btn-3
 
@@ -237,8 +237,8 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: btn-prem-2
         state: seeding
@@ -250,8 +250,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/btn-prem
       label: btn-prem-3
 
@@ -271,8 +271,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tvt
       movedone: /media/sdh1/home/tubedogg/tor/2/tvt
       label: tvt-1
@@ -286,14 +286,14 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       label: tvt-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tvt-1
         state: seeding
@@ -327,8 +327,8 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tvt-2
         state: seeding
@@ -340,8 +340,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tvt
       label: tvt-3
 
@@ -361,8 +361,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tvv
       movedone: /media/sdh1/home/tubedogg/tor/2/tvv
       label: tvv-1
@@ -376,14 +376,14 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       label: tvv-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tvv-1
         state: seeding
@@ -417,8 +417,8 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tvv-2
         state: seeding
@@ -430,8 +430,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tvv
       label: tvv-3
 
@@ -449,8 +449,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
@@ -474,8 +474,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
@@ -491,16 +491,16 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tc-1
         state: seeding
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       label: tc-2
     aria2:
       server: localhost
@@ -536,16 +536,16 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: tc-2
         state: seeding
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tc
       label: tc-3
 
@@ -563,8 +563,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
@@ -588,8 +588,8 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
@@ -605,16 +605,16 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: ptp-1
         state: seeding
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       label: ptp-2
     aria2:
       server: localhost
@@ -650,16 +650,16 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       filter:
         label: ptp-2
         state: seeding
     deluge:
       host: deluge.example.com
       port: 12345
-      user: deluge_user
-      pass: deluge_pass
+      username:tubedogg
+      password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/ptp
       label: ptp-3
 
