@@ -135,7 +135,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: btn-1
@@ -167,13 +167,13 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       label: btn-prem-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: btn-prem-1
@@ -213,7 +213,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: btn-2
@@ -226,7 +226,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/btn
       label: btn-3
@@ -237,7 +237,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: btn-prem-2
@@ -250,7 +250,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/btn-prem
       label: btn-prem-3
@@ -271,7 +271,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tvt
       movedone: /media/sdh1/home/tubedogg/tor/2/tvt
@@ -286,13 +286,13 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       label: tvt-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tvt-1
@@ -327,7 +327,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tvt-2
@@ -340,7 +340,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tvt
       label: tvt-3
@@ -361,7 +361,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tvv
       movedone: /media/sdh1/home/tubedogg/tor/2/tvv
@@ -376,13 +376,13 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       label: tvv-2
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tvv-1
@@ -417,7 +417,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tvv-2
@@ -430,7 +430,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tvv
       label: tvv-3
@@ -444,12 +444,14 @@ tasks:
 
   # filter the TC RSS feed against movies in my movie-queue
   rss_tc_movie-queue:
+    # this site has a problem with its cert
+    verify_ssl_certificates: no
     include: [ includes/tc_rss.yml ]
     movie_queue: yes
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
@@ -474,7 +476,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
@@ -491,7 +493,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tc-1
@@ -499,7 +501,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       label: tc-2
     aria2:
@@ -536,7 +538,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: tc-2
@@ -544,7 +546,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/tc
       label: tc-3
@@ -558,12 +560,12 @@ tasks:
 
   # same as for TC
   rss_ptp_movie-queue:
-    include: [ ptp_rss.yml ]
+    include: [ includes/ptp_rss.yml ]
     movie_queue: yes
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
@@ -588,7 +590,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
@@ -605,7 +607,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: ptp-1
@@ -613,7 +615,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       label: ptp-2
     aria2:
@@ -650,7 +652,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       filter:
         label: ptp-2
@@ -658,7 +660,7 @@ tasks:
     deluge:
       host: deluge.example.com
       port: 12345
-      username:tubedogg
+      username: deluge_user
       password: deluge_pass
       path: /media/sdh1/home/tubedogg/tor/3/ptp
       label: ptp-3
@@ -687,11 +689,16 @@ schedules:
     interval:
       days: 1
       at_time: 1:00 am
-  # run BTN downloads every 6 hours
+  # run btn one additional time per day
+  - tasks: ['rss_btn*']
+    interval:
+      days: 1
+      at_time: 5:00 pm
+  # start BTN downloads every 6 hours
   - tasks: ['down*btn*']
     interval:
       hours: 6
-  # run movie downloads once a day
+  # start movie downloads once a day
   - tasks: ['down*tc', 'down*ptp']
     interval:
       days: 1
