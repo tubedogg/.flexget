@@ -1,4 +1,6 @@
 ## aria2 ##
+### Availability ###
+Note the plugin has now been merged into the [Flexget project](https://github.com/Flexget/Flexget) and therefore is no longer available here.
 ### Configuration ###
 Available configuration parameters:
 
