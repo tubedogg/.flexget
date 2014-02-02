@@ -50,7 +50,7 @@ deluge: yes
 ||main_file_only||No||No||If yes, all files but the main file inside the torrent (>90% of total torrent size) will be set to 'do not download'.||
 ||rename_main_file_only||No||No||If yes, rename only the main file inside the torrent (>90% of total torrent size) using the ```content_filename``` setting.||
 ||keep_container||Yes||No||Options: yes, no, 'no-episode', 'no-other'. If no, the main directory inside the torrent (if there is one) will be removed. If set to ```no-episode```, this will only occur if the plugin determines that one file is at least 90% of the total size of the torrent (therefore assuming it's an episode, intended for use within TV tasks). If set to ```no-other```, this will only occur where there is not at least one file that is 90% or more of the total torrent size (i.e. a season pack or a film).||
-||container_filename||N/A||No||This is a template used to rename the main container directory within the torrent. Note that even if ```keep_container``` is set to one of the "no" options, this will still cause a container directory to be added to the torrent. More info [wiki:Plugins/deluge#ContentRenaming here].||
+||container_directory||N/A||No||This is a template used to rename the main container directory within the torrent. Note that even if ```keep_container``` is set to one of the "no" options, this will still cause a container directory to be added to the torrent. More info [wiki:Plugins/deluge#ContentRenaming here].||
 
 
 
@@ -117,7 +117,7 @@ Together with the movedone command, this means all TV series will be downloaded 
 /home/user/TV/Show Name/Season #/Show Name - S##E## - quality.ext
 }}}
 
-Here is a more advanced configuration using ```content_filename```, ```keep_structure``` and ```container_filename```.
+Here is a more advanced configuration using ```content_filename```, ```keep_structure``` and ```container_directory```.
 
 {{{
 series:
@@ -126,7 +126,7 @@ series:
       set:
         content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
         keep_container: no
-        container_filename: "{{series_name}} - Season {{season|pad(2)}}"
+        container_directory: "{{series_name}} - Season {{season|pad(2)}}"
     groupa:
       - Show Name
 deluge: yes
@@ -142,7 +142,7 @@ Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE/
     Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.Sample.mkv}}}
 }}}
 
-Because ```keep_container``` is set to no, the main torrent folder (```Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE```) would be removed. ```container_filename``` provides a new folder name template and this will be added in its place. (A quicker way to accomplish this would be to just leave ```keep_container``` out of the config altogether. Anytime the ```container_filename``` setting is present, the main folder will be renamed.) The individual files will also be renamed using the ```content_filename``` template. This is how the same torrent would look after being processed and added to deluge:
+Because ```keep_container``` is set to no, the main torrent folder (```Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE```) would be removed. ```container_directory``` provides a new folder name template and this will be added in its place. (A quicker way to accomplish this would be to just leave ```keep_container``` out of the config altogether. Anytime the ```container_directory``` setting is present, the main folder will be renamed.) The individual files will also be renamed using the ```content_filename``` template. This is how the same torrent would look after being processed and added to deluge:
 
 {{{
 Show Name - Season 09/
@@ -160,7 +160,7 @@ series:
     groupa:
       set:
         content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
-        container_filename: "{{series_name}} - Season {{season|pad(2)}}"
+        container_directory: "{{series_name}} - Season {{season|pad(2)}}"
         rename_main_file_only: yes
     groupa:
       - Show Name
