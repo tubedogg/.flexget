@@ -127,8 +127,8 @@ series:
         content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
         keep_container: no
         container_directory: "{{series_name}} - Season {{season|pad(2)}}"
-    groupa:
-      - Show Name
+  groupa:
+    - Show Name
 deluge: yes
 }}}
 
@@ -162,8 +162,8 @@ series:
         content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
         container_directory: "{{series_name}} - Season {{season|pad(2)}}"
         rename_main_file_only: yes
-    groupa:
-      - Show Name
+  groupa:
+    - Show Name
 deluge: yes
 }}}
 
