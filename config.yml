@@ -15,6 +15,7 @@ templates:
       movedone: /media/sdh1/home/tubedogg/tor/2/btn
       label: btn-1
       content_filename: "{{series_name}} - {{series_id|lower}}"
+      keep_container: no
 
   deluge_btn-prem:
     deluge:
@@ -482,6 +483,9 @@ tasks:
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
       content_filename: "{{movie_name}} ({{movie_year}})"
+      rename_main_file_only: yes
+      keep_container: no
+      container_directory: "{{movie_name}}"
 
 
 ### TC DOWNLOADS #######################################################
@@ -596,6 +600,9 @@ tasks:
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
       content_filename: "{{movie_name}} ({{movie_year}})"
+      rename_main_file_only: yes
+      keep_container: no
+      container_directory: "{{movie_name}}"
 
 
 ### PTP DOWNLOADS ######################################################
