@@ -1,0 +1,191 @@
+= Deluge =
+
+Downloads content from entry URL and loads it into the [http://deluge-torrent.org deluge] bittorrent client.
+
+'''{{{Requirements:}}}'''
+Supports Deluge 1.1, 1.2, and 1.3. This will not work if you are running deluge in classic mode, you must switch to running the daemon separately. If you are running deluged as a different user, on a different box, or with a non-default config directory, (something other than ~/.config/deluge) you will need to specify the username and password options that you have set up in your deluge [http://dev.deluge-torrent.org/wiki/UserGuide/Authentication auth] file.
+
+If you are installing to a virtualenv, you have to create the virtualenv with the {{{--system-site-packages}}} option. This also applies to an SVN install when running bootstrap.py.
+
+'''Example:'''
+
+{{{
+deluge:
+  path: /media/diska/downloads/
+  movedone: /media/diska/tv/
+  label: tv
+  queuetotop: yes
+}}}
+
+== Options ==
+
+All options are optional and will default to whatever you have set in deluge, or the value listed below.
+If you wish not to set any of the parameters the format is:
+
+{{{
+deluge: yes
+}}}
+
+'''Options'''
+
+||'''Name'''||'''Default'''||'''Required'''||'''Description'''||
+||host||localhost||No||Deluge host||
+||port||58846||No||Deluge port||
+||username||See note||No||Deluged username ''(note: defaults to automatic client authentication if not specified)''||
+||password||See note||No||Deluged password ''(note: defaults to automatic client authentication if not specified)''||
+||path||Deluge default||No||The download location||
+||movedone||Deluge default||No||The location files will be moved when torrent finishes (the location will be created if it doesn't exist).||
+||label||N/A||No||Deluge label||
+||queuetotop||Deluge default||No||If yes will move torrent to top of queue when added, if no will move to bottom.||
+||addpaused||Deluge default||No||If yes, will add the torrents to deluge in the paused state.||
+||maxupspeed||Deluge default||No||Sets the maximum upload speed. Must be specified as a decimal (i.e. 1.0)||
+||maxdownspeed||Deluge default||No||Sets the maximum download speed.||
+||maxconnections||Deluge default||No||Sets the maximum connections.||
+||maxupslots||Deluge default||No||Sets the maximum upload slots.||
+||ratio||Deluge default||No||Sets the ratio to stop seeding at.||
+||removeatratio||Deluge default||No||If yes, torrent will be removed from deluge when ratio is reached.||
+||compact||Deluge default||No||If yes, will allocate torrent in compact mode.||
+||automanaged||Deluge default||No||If set to false torrents will be added to deluge without the automanaged flag.||
+||content_filename||N/A||No||This can be used to rename the main file inside the torrent. More info [wiki:Plugins/deluge#ContentRenaming here].||
+||main_file_only||No||No||If yes, all files but the main file inside the torrent (>90% of total torrent size) will be set to 'do not download'.||
+||rename_main_file_only||No||No||If yes, rename only the main file inside the torrent (>90% of total torrent size) using the ```content_filename``` setting.||
+||keep_container||Yes||No||Options: yes, no, 'no-episode', 'no-other'. If no, the main directory inside the torrent (if there is one) will be removed. If set to ```no-episode```, this will only occur if the plugin determines that one file is at least 90% of the total size of the torrent (therefore assuming it's an episode, intended for use within TV tasks). If set to ```no-other```, this will only occur where there is not at least one file that is 90% or more of the total torrent size (i.e. a season pack or a film).||
+||container_filename||N/A||No||This is a template used to rename the main container directory within the torrent. Note that even if ```keep_container``` is set to one of the "no" options, this will still cause a container directory to be added to the torrent. More info [wiki:Plugins/deluge#ContentRenaming here].||
+
+
+
+== Advanced ==
+
+Some plugins allow [wiki:Plugins/set set:] statements as a subcommand.
+The deluge plugin will read any of the normal parameters from the ```set:``` command, except for deluge daemon info (host, port, username, password.)
+Here is an example using the series module:
+
+Example with set:
+
+{{{
+series:
+  settings:
+    720p:
+      quality: 720p hdtv|webdl
+      set:
+        path: /media/diska/incomplete/
+        movedone: "/media/diska/TV/{{series_name}}/"
+        label: 720p
+    hdtv:
+      quality: hdtv <720p
+      set:
+        path: /media/diskb/incomplete/
+        movedone: "/media/diskb/TV/{{series_name}}/Season {{series_season}}/"
+        label: tv
+  720p:
+    - name 1
+    - name 2
+  hdtv:
+    - name 3
+    - name 4:
+        set:
+          movedone: /media/diskb/otherfolder/
+          queuetotop: yes
+deluge: yes
+}}}
+
+The more specific set commands will override the less specific ones (i.e. the set command from name 4 will override the set values from the hdtv group.)
+
+=== Content and Container (Directory) Renaming ===
+
+The deluge plugin also supports two advanced features: content file and container (directory) renaming. This will allow you to change the filename and directory structure of the files inside the torrent in deluge. The optional setting ```rename_main_file_only``` will cause only 1 file in the torrent to be renamed as long as it is 90% or more of the total torrent size.
+
+Here is an example configuration using ```content_filename``` and ```movedone```:
+
+{{{
+series:
+  settings:
+    groupa:
+      set:
+        content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
+        movedone: /home/user/TV/{{series_name}}/Season {{series_season}}/
+  groupa:
+    - Show Name
+deluge: yes
+}}}
+
+This config uses [wiki:Plugins/set#Jinja2Templating jinja2] notation to rename the file using information from the series parser. If there was a file called {{{Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.[eztv].mkv}}} inside the torrent, it would be renamed to {{{Show Name - S09E15 - 720p.mkv}}}. If there is already a file with the new name present in either the downloading folder, or movedone folder, a trailing number will be added to the filename. i.e. {{{Show Name - S09E15 - 720p(2).mkv}}}.
+
+Together with the movedone command, this means all TV series will be downloaded to:
+
+{{{
+/home/user/TV/Show Name/Season #/Show Name - S##E## - quality.ext
+}}}
+
+Here is a more advanced configuration using ```content_filename```, ```keep_structure``` and ```container_filename```.
+
+{{{
+series:
+  settings:
+    groupa:
+      set:
+        content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
+        keep_container: no
+        container_filename: "{{series_name}} - Season {{season|pad(2)}}"
+    groupa:
+      - Show Name
+deluge: yes
+}}}
+
+This config also uses jinja2 notation. Note the deluge plugin also provides the ```season``` field to the entry, allowing it to be used as shown above. Consider the following example torrent:
+
+{{{
+Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE/
+  Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.mkv
+  Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.nfo
+  Sample/
+    Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.Sample.mkv}}}
+}}}
+
+Because ```keep_container``` is set to no, the main torrent folder (```Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE```) would be removed. ```container_filename``` provides a new folder name template and this will be added in its place. (A quicker way to accomplish this would be to just leave ```keep_container``` out of the config altogether. Anytime the ```container_filename``` setting is present, the main folder will be renamed.) The individual files will also be renamed using the ```content_filename``` template. This is how the same torrent would look after being processed and added to deluge:
+
+{{{
+Show Name - Season 09/
+  Show Name - S09E15 - 720p.mkv
+  Show Name - S09E15 - 720p.nfo
+  Sample/
+    Show Name - S09E15 - 720p.mkv
+}}}
+
+Again using the above torrent as an example, consider this config:
+
+{{{
+series:
+  settings:
+    groupa:
+      set:
+        content_filename: "{{series_name}} - {{series_id}} - {{quality}}"
+        container_filename: "{{series_name}} - Season {{season|pad(2)}}"
+        rename_main_file_only: yes
+    groupa:
+      - Show Name
+deluge: yes
+}}}
+
+This would result in the following torrent file structure. Note that since only the main file was renamed, the ```content_filename``` setting had no effect on the other files in the torrent, but they are all moved into the new ```container_directory```.
+
+{{{
+Show Name - Season 09/
+  Show Name - S09E15 - 720p.mkv
+  Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.nfo
+  Sample/
+    Show.Name.9x15.REPACK.720p.HDTV.x264-IMMERSE.Sample.mkv
+}}}
+
+
+
+== Mac OSX Users ==
+Should you wish to use the Deluge plugin, Flexget currently requires Deluge to be installed via [http://dev.deluge-torrent.org/wiki/Installing/MacOSX/ macports] (or source). Flexget is currently unable to interact with a deluge.app installation (as per ticket [http://flexget.com/ticket/1686/ 1686] and [http://flexget.com/ticket/1886/ 1886]). 
+
+== Windows Users ==
+
+As of r2297 !FlexGet should be able to detect Deluge in its install directory if:
+- Deluge is installed in <program files>\Deluge
+- !FlexGet is installed with the same Python version Deluge is using (currently [http://python.org/ftp/python/2.6.6/python-2.6.6.msi 32-bit 2.6], as of Deluge 1.3.5)
+
+You can ignore messages about disconnecting from the daemon in a 'non-clean' fashion. This is normal on Windows.
