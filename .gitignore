@@ -1,11 +1,11 @@
 *.pyc
 includes/
 db-config.sqlite
-flexget.log
-flexget.log.*
+*.log*
 *.sqlite
 .DS_Store
 temp/
 *.sh
 .ignore/
 *.sqlite_*
+*.config-lock

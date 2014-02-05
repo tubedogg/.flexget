@@ -14,7 +14,7 @@ templates:
       path: /media/sdh1/home/tubedogg/tor/1/btn
       movedone: /media/sdh1/home/tubedogg/tor/2/btn
       label: btn-1
-      content_filename: "{{series_name}} - {{series_id|lower}}"
+      content_filename: '{{series_name}} - {{series_id|lower}}'
       keep_container: no
 
   deluge_btn-prem:
@@ -26,7 +26,7 @@ templates:
       path: /media/sdh1/home/tubedogg/tor/1/btn-prem
       movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
       label: btn-prem-1
-      content_filename: "{{series_name}} - {{series_id|lower}}"
+      content_filename: '{{series_name}} - {{series_id|lower}}'
 
 
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
@@ -99,28 +99,34 @@ tasks:
 
 ### BTN TORRENT WATCHDIR ###############################################
 
-  # easy way to upload torrents i manually download, from specific
+  # easy way to upload torrents I manually download, from specific
   # folders, and still get all the magic benefits of flexget
   watchdir_btn-eps:
     template: deluge_btn
     find:
-      path: ~/Torrents/btn
+      path: "/Users/tubedogg/Torrents/btn"
       mask: '*.torrent'
     all_series: yes
+    move:
+      to: "/Users/tubedogg/Torrents/_done"
 
   watchdir_btn-seasons:
     template: deluge_btn
     find:
-      path: ~/Torrents/btn
+      path: "/Users/tubedogg/Torrents/btn"
       mask: '*.torrent'
     accept_all: yes
+    move:
+      to: "/Users/tubedogg/Torrents/_done"
 
   watchdir_btn-prem:
     template: deluge_btn-prem
     find:
-      path: ~/Torrents/btn-prem
+      path: "/Users/tubedogg/Torrents/btn-prem"
       mask: '*.torrent'
     accept_all: yes
+    move:
+      to: "/Users/tubedogg/Torrents/_done"
 
 
 ### BTN DOWNLOADS ######################################################
@@ -157,7 +163,7 @@ tasks:
       parse_filename: yes
       rename_content_files: yes
       content_is_episodes: yes
-      rename_template: "{{series_name}} - {{series_id|lower()}}"
+      rename_template: '{{series_name}} - {{series_id|lower()}}'
     # if these are not disabled, it will reject everything due to
     # already having seen it when added to deluge originally. yes this
     # is a hack-ish workaround
@@ -195,7 +201,7 @@ tasks:
       parse_filename: yes
       rename_content_files: yes
       content_is_episodes: yes
-      rename_template: "{{series_name}} - {{series_id|lower()}}"
+      rename_template: '{{series_name}} - {{series_id|lower()}}'
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
 
@@ -266,9 +272,11 @@ tasks:
   # same as for BTN
   watchdir_tvt:
     find:
-      path: ~/Torrents/tvt
+      path: "/Users/tubedogg/Torrents/tvt"
       mask: '*.torrent'
     all_series: yes
+    move:
+      to: "/Users/tubedogg/Torrents/_done"
     deluge:
       host: deluge.example.com
       port: 12345
@@ -277,7 +285,7 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/tvt
       movedone: /media/sdh1/home/tubedogg/tor/2/tvt
       label: tvt-1
-      content_filename: "{{series_name}} - {{series_id|lower}}"
+      content_filename: '{{series_name}} - {{series_id|lower}}'
 
 
 ### TVT DOWNLOADS ######################################################
@@ -314,7 +322,7 @@ tasks:
       parse_filename: yes
       rename_content_files: yes
       content_is_episodes: yes
-      rename_template: "{{series_name}} - {{series_id|lower()}}"
+      rename_template: '{{series_name}} - {{series_id|lower()}}'
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
 
@@ -356,9 +364,11 @@ tasks:
   # same as for BTN
   watchdir_tvv:
     find:
-      path: ~/Torrents/tvv
+      path: "/Users/tubedogg/Torrents/tvv"
       mask: '*.torrent'
     all_series: yes
+    move:
+      to: "/Users/tubedogg/Torrents/_done"
     deluge:
       host: deluge.example.com
       port: 12345
@@ -367,7 +377,7 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/tvv
       movedone: /media/sdh1/home/tubedogg/tor/2/tvv
       label: tvv-1
-      content_filename: "{{series_name}} - {{series_id|lower}}"
+      content_filename: '{{series_name}} - {{series_id|lower}}'
 
 
 ### TVV DOWNLOADS ######################################################
@@ -404,7 +414,7 @@ tasks:
       parse_filename: yes
       rename_content_files: yes
       content_is_episodes: yes
-      rename_template: "{{series_name}} - {{series_id|lower()}}"
+      rename_template: '{{series_name}} - {{series_id|lower()}}'
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
 
@@ -457,7 +467,7 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
-      content_filename: "{{movie_name}} ({{movie_year}})"
+      content_filename: '{{movie_name}} ({{movie_year}})'
 
 
 ### TC TORRENT WATCHDIR ################################################
@@ -465,7 +475,7 @@ tasks:
   # similar to BTN, different content_filename though
   watchdir_tc:
     find:
-      path: ~/Torrents/tc
+      path: "/Users/tubedogg/Torrents/tc"
       mask: '*.torrent'
     set:
       title: '{{movie_name}} ({{movie_year}})'
@@ -473,7 +483,7 @@ tasks:
     accept_all: yes
     movie_queue: yes
     move:
-      to: "~/Torrents/_done"
+      to: "/Users/tubedogg/Torrents/_done"
     deluge:
       host: deluge.example.com
       port: 12345
@@ -482,10 +492,10 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
-      content_filename: "{{movie_name}} ({{movie_year}})"
+      content_filename: '{{movie_name}} ({{movie_year}})'
       rename_main_file_only: yes
       keep_container: no
-      container_directory: "{{movie_name}}"
+      container_directory: '{{movie_name}}'
 
 
 ### TC DOWNLOADS #######################################################
@@ -574,7 +584,7 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
-      content_filename: "{{movie_name}} ({{movie_year}})"
+      content_filename: '{{movie_name}} ({{movie_year}})'
 
 
 ### PTP TORRENT WATCHDIR ###############################################
@@ -582,7 +592,7 @@ tasks:
   # same as for TC
   watchdir_ptp:
     find:
-      path: ~/Torrents/ptp
+      path: "/Users/tubedogg/Torrents/ptp"
       mask: '*.torrent'
     set:
       title: '{{movie_name}} ({{movie_year}})'
@@ -590,7 +600,7 @@ tasks:
     accept_all: yes
     movie_queue: yes
     move:
-      to: "~/Torrents/_done"
+      to: "/Users/tubedogg/Torrents/_done"
     deluge:
       host: deluge.example.com
       port: 12345
@@ -599,10 +609,10 @@ tasks:
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
-      content_filename: "{{movie_name}} ({{movie_year}})"
+      content_filename: '{{movie_name}} ({{movie_year}})'
       rename_main_file_only: yes
       keep_container: no
-      container_directory: "{{movie_name}}"
+      container_directory: '{{movie_name}}'
 
 
 ### PTP DOWNLOADS ######################################################
@@ -629,7 +639,7 @@ tasks:
       server: localhost
       port: 6800
       do: add-new
-      uri: ftp://ftp_user:ftp_pass@deluge.example.com:21/tor/2/ptp/{{filename}}
+      uri: 'ftp://ftp_user:ftp_pass@deluge.example.com:21/tor/2/ptp/{{filename}}'
       exclude_samples: yes
       exclude_non_content: yes
       parse_filename: yes
@@ -685,6 +695,58 @@ tasks:
       quality: 720p+ bluray
 
 
+########################################################################
+################# MANUAL DOWNLOADS #####################################
+########################################################################
+
+  # parse text file and pass to aria2
+  parse_url_text_file:
+    regexp_parse:
+      # File to rad
+      source: "/Users/tubedogg/Torrents/URLs.txt"
+      sections:
+        # I use a shell script on the server to output files with the following format (used to be fed directly into
+        # aria2):
+        # ftp://user:pass@example.com:21/path/to/file.mkv
+        #   dir=/Volumes/all_my_tv
+        # This regex breaks the file into sections (essentially possible entries) based on this format
+        - {regexp: 'ftp://.*\n\s\sdir=.*\n'}
+      keys:
+        title:
+          regexps:
+            # set title to the ftp line, should be unique enough
+            - {regexp: '^ftp://.*/.*'}
+        url:
+          regexps:
+            # set url to the ftp line, should be unique enough
+            - {regexp: '^ftp://.*/.*'}
+        aria2_dir:
+          regexps:
+            # regex to get the directory line
+            - {regexp: '\s\sdir=.*'}
+        content_files:
+          # regexp for just the filename
+          regexps:
+            # returns just the filename portion of the ftp line
+            - {regexp: '[^/]*\.[a-zA-Z0-9]{3,4}$'}
+    # accept everything
+    accept_all: yes
+    aria2:
+      server: localhost
+      port: 6800
+      do: add-new
+      # URI of the file to download...use the FTP URL
+      uri: '{{url}}'
+      fix_year: no
+      aria_config:
+        # directory to store in locally is included verbatim
+        dir: '{{aria2_dir|re_replace("\s\sdir=", "")}}'
+        max-connection-per-server: 4
+        max-concurrent-downloads: 4
+        split: 4
+        file-allocation: none
+
+
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$* SCHEDULES $*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
@@ -699,7 +761,8 @@ schedules:
   # run btn one additional time per day
   - tasks: ['rss_btn*']
     interval:
-      minutes: 10
+      days: 1
+      at_time: 5:00 pm
   # start BTN downloads every 6 hours
   - tasks: ['down*btn*']
     interval:
@@ -718,3 +781,7 @@ schedules:
   - tasks: ['movie_queue_from_trakt']
     interval:
       days: 2
+  # run watch tasks every hour
+  - tasks: ['watch*']
+    interval:
+      hours: 1
