@@ -701,6 +701,7 @@ tasks:
 
   # parse text file and pass to aria2
   parse_url_text_file:
+    manual: yes
     regexp_parse:
       # File to rad
       source: "/Users/tubedogg/Torrents/URLs.txt"
