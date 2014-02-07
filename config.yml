@@ -798,7 +798,7 @@ tasks:
       - prowl_master
     set:
       event: Trakt to movie-queue
-      pre-desc: 'Added to movie-queue:'
+      pre_desc: 'Added to movie-queue:'
     accept_all: yes
     queue_movies:
       quality: 720p+ bluray
