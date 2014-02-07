@@ -309,8 +309,12 @@ tasks:
   # TODO: make aria2 an input plugin too
   cleanup_downloads_btn:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/btn
+      label: btn-3
     disable_builtins: [seen_info_hash, seen]
     from_deluge:
       host: deluge.example.com
@@ -325,19 +329,16 @@ tasks:
       server: localhost
       port: 6800
       do: remove-completed
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/btn
-      label: btn-3
 
   cleanup_downloads_btn-prem:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/btn-prem
+      label: btn-prem-3
     from_deluge:
       host: deluge.example.com
       port: 12345
@@ -351,13 +352,6 @@ tasks:
       server: localhost
       port: 6800
       do: remove-completed
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/btn-prem
-      label: btn-prem-3
 
 
 ########################################################################
@@ -434,9 +428,13 @@ tasks:
   # same as for BTN
   cleanup_downloads_tvt:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/tvt
+      label: tvt-3
     from_deluge:
       host: deluge.example.com
       port: 12345
@@ -450,13 +448,6 @@ tasks:
       server: localhost
       port: 6800
       do: remove-completed
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/tvt
-      label: tvt-3
 
 
 ########################################################################
@@ -482,8 +473,8 @@ tasks:
       path: "/Users/tubedogg/Torrents/tvv"
       mask: '*.torrent'
     all_series: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
 
 ### TVV DOWNLOADS ######################################################
@@ -533,9 +524,13 @@ tasks:
   # same as for BTN
   cleanup_downloads_tvv:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/tvv
+      label: tvv-3
     from_deluge:
       host: deluge.example.com
       port: 12345
@@ -549,13 +544,6 @@ tasks:
       do: remove-completed
       server: localhost
       port: 6800
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/tvv
-      label: tvv-3
 
 
 ########################################################################
@@ -606,8 +594,8 @@ tasks:
     imdb_lookup: yes
     accept_all: yes
     movie_queue: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
 
 ### TC DOWNLOADS #######################################################
@@ -656,9 +644,13 @@ tasks:
   # same as for BTN
   cleanup_downloads_tc:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/tc
+      label: tc-3
     accept_all: yes
     aria2:
       server: localhost
@@ -674,13 +666,6 @@ tasks:
       filter:
         label: tc-2
         state: seeding
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/tc
-      label: tc-3
 
 
 ########################################################################
@@ -728,13 +713,8 @@ tasks:
     imdb_lookup: yes
     accept_all: yes
     movie_queue: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
 
 ### PTP DOWNLOADS ######################################################
@@ -783,9 +763,13 @@ tasks:
   # same as for TC
   cleanup_downloads_ptp:
     manual: yes
-    template: 
+    template:
+      - deluge_connect
       - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
+    set:
+      path: /media/sdh1/home/tubedogg/tor/3/ptp
+      label: ptp-3
     accept_all: yes
     aria2:
       server: localhost
@@ -801,13 +785,6 @@ tasks:
       filter:
         label: ptp-2
         state: seeding
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/3/ptp
-      label: ptp-3
 
 
 ########################################################################
