@@ -5,28 +5,44 @@ templates:
 
 ### DELUGE BTN #########################################################
 
-  deluge_btn:
+  deluge_connect:
     deluge:
       host: deluge.example.com
       port: 12345
       username: deluge_user
       password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/1/btn
-      movedone: /media/sdh1/home/tubedogg/tor/2/btn
-      label: btn-1
-      content_filename: '{{series_name}} - {{series_id|lower}}'
-      keep_container: no
+      addpaused: yes
 
-  deluge_btn-prem:
+  deluge_connect_movies:
     deluge:
       host: deluge.example.com
       port: 12345
       username: deluge_user
       password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/1/btn-prem
-      movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
-      label: btn-prem-1
-      content_filename: '{{series_name}} - {{series_id|lower}}'
+      keep_container: no
+      container_directory: '{{movie_name}}'
+      rename_main_file_only: yes
+      addpaused: yes
+
+  download_priorities:
+    # if aria2 fails, don't update deluge (higher number tasks run first)
+    plugin_priority:
+      from_deluge: 136
+      aria2: 137
+
+  cleanup_priorities:
+    # if aria2 fails, don't update deluge (higher number tasks run first)
+    plugin_priority:
+      from_deluge: 136
+      aria2: 137
+
+  prowl_master:
+    # ping my iPhone when certain events occur (start leeching, start downloading)
+    prowl:
+      apikey: 1234567891234567891234567891234567891234
+      application: Flexget
+      event: '{{event}}'
+      description: '{% if pre_desc %}{{pre_desc}} - {% endif %}{% if series_name %}{{series_name}}{% if series_id %} - {{series_id}}{% endif %}{% elif movie_name %}{{movie_name}} ({{year}}){% elif title %}{{title}}{% endif %}'
 
 
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
@@ -44,14 +60,34 @@ tasks:
     include:
       - shows.yml
       - includes/btn_rss_720p-mkv.yml
-    template: deluge_btn
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      # these are used in the prowl_master template in the event and description fields, respectively
+      event: RSS to Deluge
+      pre_desc: 'Now leeching: BTN (my shows)'
+      # deluge fields
+      path: /media/sdh1/home/tubedogg/tor/1/btn
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn
+      label: btn-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
 
   rss_btn_other-shows:
     # misc shows not on my main list, but that I want to catch
     include:
       - misc-shows.yml
       - includes/btn_rss_720p-mkv.yml
-    template: deluge_btn
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: RSS to deluge
+      pre_desc: 'Now leeching: BTN (other shows)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn
+      label: btn-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
 
   rss_btn_my-premieres:
     # premieres I am waiting for, based on my Trakt list premieres,
@@ -59,7 +95,16 @@ tasks:
     include:
       - includes/trakt_premieres.yml
       - includes/btn_rss_720p-mkv.yml
-    template: deluge_btn-prem
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: RSS to Deluge
+      pre_desc: 'Now leeching: BTN (my premieres)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn-prem
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
+      label: btn-prem-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
     # if I used series_premiere: yes here, it would match every S01E01
     # in the feed and wouldn't even check against my list...bug or
     # feature? instead, check for S01E01 manually
@@ -71,7 +116,16 @@ tasks:
     # networks, matching against the BTN MKV 720p feed
     include:
       - includes/btn_rss_720p-mkv.yml
-    template: deluge_btn-prem
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: RSS to Deluge
+      pre_desc: 'Now leeching: BTN (all premieres)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn-prem
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
+      label: btn-prem-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
     # here I can use series_premiere because I do want everything, and
     # i'm filtering the output from there
     series_premiere:
@@ -102,42 +156,78 @@ tasks:
   # easy way to upload torrents I manually download, from specific
   # folders, and still get all the magic benefits of flexget
   watchdir_btn-eps:
-    template: deluge_btn
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: BTN (eps)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn
+      label: btn-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
+    no_entries_ok: yes
     find:
       path: "/Users/tubedogg/Torrents/btn"
       mask: '*.torrent'
     all_series: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
+    # this fails every time. do not know why.
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
   watchdir_btn-seasons:
-    template: deluge_btn
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: BTN (seasons)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn
+      label: btn-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
+    no_entries_ok: yes
     find:
       path: "/Users/tubedogg/Torrents/btn"
       mask: '*.torrent'
     accept_all: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
   watchdir_btn-prem:
-    template: deluge_btn-prem
+    template:
+      - deluge_connect
+      - prowl_master
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: BTN (premieres)'
+      path: /media/sdh1/home/tubedogg/tor/1/btn-prem
+      movedone: /media/sdh1/home/tubedogg/tor/2/btn-prem
+      label: btn-prem-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
+    no_entries_ok: yes
     find:
       path: "/Users/tubedogg/Torrents/btn-prem"
       mask: '*.torrent'
     accept_all: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
 
 ### BTN DOWNLOADS ######################################################
 
   # downloads are processed through aria2
   downloads_btn:
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template: 
+      # if aria2 is not running, it will cause the task to abort, leaving the entries in deluge alone so I can
+      # easily tell what has actually been fed to aria2
+      - download_priorities
+      - deluge_connect
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: BTN'
       label: btn-2
     from_deluge:
       host: deluge.example.com
@@ -171,11 +261,14 @@ tasks:
     accept_all: yes
 
   downloads_btn-prem:
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template:
+      - deluge_connect
+      - download_priorities
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: BTN (premieres)'
       label: btn-prem-2
     from_deluge:
       host: deluge.example.com
@@ -216,6 +309,8 @@ tasks:
   # TODO: make aria2 an input plugin too
   cleanup_downloads_btn:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     from_deluge:
       host: deluge.example.com
@@ -240,6 +335,8 @@ tasks:
 
   cleanup_downloads_btn-prem:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     from_deluge:
       host: deluge.example.com
@@ -271,32 +368,37 @@ tasks:
 
   # same as for BTN
   watchdir_tvt:
-    find:
-      path: "/Users/tubedogg/Torrents/tvt"
-      mask: '*.torrent'
-    all_series: yes
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template:
+      - deluge_connect
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: TVT'
       path: /media/sdh1/home/tubedogg/tor/1/tvt
       movedone: /media/sdh1/home/tubedogg/tor/2/tvt
       label: tvt-1
       content_filename: '{{series_name}} - {{series_id|lower}}'
+    find:
+      path: "/Users/tubedogg/Torrents/tvt"
+      mask: '*.torrent'
+    all_series: yes
+    #move:
+    #  to: "/Users/tubedogg/Torrents/_done"
 
 
 ### TVT DOWNLOADS ######################################################
 
   # same as for BTN
   downloads_tvt:
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template: 
+      - download_priorities
+      - deluge_connect
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: TVT'
       label: tvt-2
     from_deluge:
       host: deluge.example.com
@@ -332,6 +434,8 @@ tasks:
   # same as for BTN
   cleanup_downloads_tvt:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     from_deluge:
       host: deluge.example.com
@@ -363,32 +467,37 @@ tasks:
 
   # same as for BTN
   watchdir_tvv:
+    template:
+      - deluge_connect
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: TVV'
+      path: /media/sdh1/home/tubedogg/tor/1/tvv
+      movedone: /media/sdh1/home/tubedogg/tor/2/tvv
+      label: tvv-1
+      content_filename: '{{series_name}} - {{series_id|lower}}'
     find:
       path: "/Users/tubedogg/Torrents/tvv"
       mask: '*.torrent'
     all_series: yes
     move:
       to: "/Users/tubedogg/Torrents/_done"
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/1/tvv
-      movedone: /media/sdh1/home/tubedogg/tor/2/tvv
-      label: tvv-1
-      content_filename: '{{series_name}} - {{series_id|lower}}'
 
 
 ### TVV DOWNLOADS ######################################################
 
   # same as for BTN
   downloads_tvv:
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template:
+      - deluge_connect
+      - download_priorities
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: TVV'
       label: tvv-2
     from_deluge:
       host: deluge.example.com
@@ -424,6 +533,8 @@ tasks:
   # same as for BTN
   cleanup_downloads_tvv:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     from_deluge:
       host: deluge.example.com
@@ -456,24 +567,37 @@ tasks:
   # filter the TC RSS feed against movies in my movie-queue
   rss_tc_movie-queue:
     # this site has a problem with its cert
-    verify_ssl_certificates: no
-    include: [ includes/tc_rss.yml ]
-    movie_queue: yes
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template:
+      - deluge_connect_movies
+      - prowl_master
+    set:
+      event: RSS to Deluge
+      pre_desc: 'Now leeching: TC (movie queue)'
       path: /media/sdh1/home/tubedogg/tor/1/tc
       movedone: /media/sdh1/home/tubedogg/tor/2/tc
       label: tc-1
       content_filename: '{{movie_name}} ({{movie_year}})'
+    verify_ssl_certificates: no
+    include: [ includes/tc_rss.yml ]
+    movie_queue: yes
 
 
 ### TC TORRENT WATCHDIR ################################################
 
   # similar to BTN, different content_filename though
   watchdir_tc:
+    template:
+      - deluge_connect_movies
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: TC'
+      path: /media/sdh1/home/tubedogg/tor/1/tc
+      movedone: /media/sdh1/home/tubedogg/tor/2/tc
+      label: tc-1
+      content_filename: '{{movie_name}} ({{movie_year}})'
+      rename_main_file_only: yes
     find:
       path: "/Users/tubedogg/Torrents/tc"
       mask: '*.torrent'
@@ -484,24 +608,21 @@ tasks:
     movie_queue: yes
     move:
       to: "/Users/tubedogg/Torrents/_done"
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/1/tc
-      movedone: /media/sdh1/home/tubedogg/tor/2/tc
-      label: tc-1
-      content_filename: '{{movie_name}} ({{movie_year}})'
-      rename_main_file_only: yes
-      keep_container: no
-      container_directory: '{{movie_name}}'
 
 
 ### TC DOWNLOADS #######################################################
 
   # similar to BTN, different rename_template and end directory though
   downloads_tc:
+    template: 
+      - deluge_connect
+      - download_priorities
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: TC'
+      label: tc-2
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     from_deluge:
@@ -512,12 +633,6 @@ tasks:
       filter:
         label: tc-1
         state: seeding
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      label: tc-2
     aria2:
       server: localhost
       port: 6800
@@ -541,6 +656,8 @@ tasks:
   # same as for BTN
   cleanup_downloads_tc:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     aria2:
@@ -574,23 +691,35 @@ tasks:
 
   # same as for TC
   rss_ptp_movie-queue:
-    include: [ includes/ptp_rss.yml ]
-    movie_queue: yes
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
+    template:
+      - deluge_connect_movies
+      - prowl_master
+    set:
+      event: RSS to Deluge
+      pre_desc: 'Now leeching: PTP (movie queue)'
       path: /media/sdh1/home/tubedogg/tor/1/ptp
       movedone: /media/sdh1/home/tubedogg/tor/2/ptp
       label: ptp-1
       content_filename: '{{movie_name}} ({{movie_year}})'
+    include: [ includes/ptp_rss.yml ]
+    movie_queue: yes
 
 
 ### PTP TORRENT WATCHDIR ###############################################
 
   # same as for TC
   watchdir_ptp:
+    template:
+      - deluge_connect_movies
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Watch to Deluge
+      pre_desc: 'Now leeching: PTP'
+      path: /media/sdh1/home/tubedogg/tor/1/ptp
+      movedone: /media/sdh1/home/tubedogg/tor/2/ptp
+      label: ptp-1
+      content_filename: '{{movie_name}} ({{movie_year}})'
     find:
       path: "/Users/tubedogg/Torrents/ptp"
       mask: '*.torrent'
@@ -606,19 +735,21 @@ tasks:
       port: 12345
       username: deluge_user
       password: deluge_pass
-      path: /media/sdh1/home/tubedogg/tor/1/ptp
-      movedone: /media/sdh1/home/tubedogg/tor/2/ptp
-      label: ptp-1
-      content_filename: '{{movie_name}} ({{movie_year}})'
-      rename_main_file_only: yes
-      keep_container: no
-      container_directory: '{{movie_name}}'
 
 
 ### PTP DOWNLOADS ######################################################
 
   # same as for TC
   downloads_ptp:
+    template: 
+      - deluge_connect
+      - download_priorities
+      - prowl_master
+    no_entries_ok: yes
+    set:
+      event: Deluge to aria2
+      pre_desc: 'Now downloading: PTP'
+      label: ptp-2
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     from_deluge:
@@ -629,12 +760,6 @@ tasks:
       filter:
         label: ptp-1
         state: seeding
-    deluge:
-      host: deluge.example.com
-      port: 12345
-      username: deluge_user
-      password: deluge_pass
-      label: ptp-2
     aria2:
       server: localhost
       port: 6800
@@ -658,6 +783,8 @@ tasks:
   # same as for TC
   cleanup_downloads_ptp:
     manual: yes
+    template: 
+      - cleanup_priorities
     disable_builtins: [seen_info_hash, seen]
     accept_all: yes
     aria2:
@@ -690,6 +817,11 @@ tasks:
   # read my trakt "Movies to Get" list and add to movie-queue in flexget
   movie_queue_from_trakt:
     include: [ includes/trakt_movies-to-get.yml ]
+    template:
+      - prowl_master
+    set:
+      event: Trakt to movie-queue
+      pre-desc: 'Added to movie-queue:'
     accept_all: yes
     queue_movies:
       quality: 720p+ bluray
@@ -764,15 +896,14 @@ schedules:
     interval:
       days: 1
       at_time: 5:00 pm
-  # start BTN downloads every 6 hours
+  # start BTN downloads every hour
   - tasks: ['down*btn*']
     interval:
-      hours: 6
-  # start movie downloads once a day
+      hours: 1
+  # start movie downloads every 3 hours
   - tasks: ['down*tc', 'down*ptp']
     interval:
-      days: 1
-      at_time: 5:00 am
+      hours: 3
   # run TVV and TVT downloads once every 3 days since the trackers
   # are not used as much (by me)
   - tasks: ['down*tv*']
