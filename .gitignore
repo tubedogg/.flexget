@@ -2,7 +2,7 @@
 includes/
 db-config.sqlite
 *.log*
-*.sqlite
+*.sqlite*
 .DS_Store
 temp/
 *.sh
