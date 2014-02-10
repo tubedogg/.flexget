@@ -141,25 +141,25 @@ tasks:
     # i'm filtering the output from there
     series_premiere:
       allow_teasers: no
-    thetvdb_lookup: yes
+    trakt_lookup: yes
     # if these fields aren't present, reject, because i can't filter for
     # them
     require_field:
-      #- tvdb_genres
-      - tvdb_first_air_date
+      - trakt_series_genres
+      - trakt_series_network
     if:
       # if it didn't first air in the last 60 days it's not actually new
-      - tvdb_first_air_date != None and tvdb_first_air_date < now - timedelta(days=60): reject
+      - trakt_series_first_aired_epoch != None and fromtimestamp(trakt_series_first_aired_epoch) < now - timedelta(days=60): reject
     regexp:
       reject:
-        #- talk show: {from: tvdb_genres}
-        #- game show: {from: tvdb_genres}
-        #- reality: {from: tvdb_genres}
-        #- children: {from: tvdb_genres}
-        - hallmark channel: {from: tvdb_network}
+        - talk show: {from: trakt_series_genres}
+        - game show: {from: trakt_series_genres}
+        - reality: {from: trakt_series_genres}
+        - children: {from: trakt_series_genres}
+        - hallmark channel: {from: trakt_series_network}
         # ^ *shudders*
-        - bravo: {from: tvdb_network}
-        - lifetime( movie)?: {from: tvdb_network}
+        - bravo: {from: trakt_series_network}
+        - lifetime( movie)?: {from: trakt_series_network}
 
 
 ### BTN TORRENT WATCHDIR ###############################################
@@ -185,7 +185,6 @@ tasks:
       path: "/Users/tubedogg/Torrents/btn"
       mask: '*.torrent'
     all_series: yes
-    # this fails every time. do not know why.
 
   watchdir_btn-seasons:
     template:
