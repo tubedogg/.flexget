@@ -3,7 +3,7 @@
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
 templates:
 
-### DELUGE BTN #########################################################
+### DELUGE #############################################################
 
   deluge_connect:
     deluge:
@@ -22,6 +22,9 @@ templates:
       container_directory: '{{movie_name}}'
       rename_main_file_only: yes
 
+
+### FIX PLUGIN PRIORITIES ##############################################
+
   download_priorities:
     # if aria2 fails, don't update deluge (higher number tasks run first)
     plugin_priority:
@@ -34,18 +37,75 @@ templates:
       from_deluge: 136
       aria2: 137
 
+
+### PROWL ##############################################################
+
   prowl_master:
-    # ping my iPhone when certain events occur (start leeching, start downloading)
+    # ping my iPhone when certain events occur (start leeching, start
+    # downloading)
     prowl:
       apikey: 1234567891234567891234567891234567891234
       application: Flexget
       event: '{{event}}'
       description: '{% if pre_desc is defined %}{{pre_desc}} - {% endif %}{% if series_name is defined %}{{series_name}}{% if series_id is defined %} - {{series_id}}{% endif %}{% elif movie_name is defined %}{{movie_name}}{% if movie_year is defined %} ({{movie_year}}){% endif %}{% elif title is defined %}{{title}}{% endif %}'
 
+
+### MOVE TORRENT FILES #################################################
+
   move_watch_torrents:
+    # move files from local watch directories once added to remote
+    # Deluge
+    set:
+      - filename: '{{title}}'
     move:
-      to: "/Users/tubedogg/Torrents/_done"
-      filename: '{{title}}.torrent'
+      move_to: '/Users/tubedogg/Torrents/_done'
+
+
+### TRAKT LISTS ########################################################
+
+  trakt_input_premieres:
+    # upcoming shows i want to be sure to grab
+    configure_series:
+      from:
+        trakt_list:
+          username: trakt_username
+          password: trakt_password
+          apikey: 12345678912345678912345678912345
+          custom: premieres
+
+  trakt_remove_premieres:
+    # remove shows once premiere is grabbed
+    trakt_remove:
+      username: trakt_username
+      password: trakt_password
+      apikey: 12345678912345678912345678912345
+      list: premieres
+
+  trakt_input_shows-i-watch:
+    # shows i currently watch
+    configure_series:
+      from:
+        trakt_list:
+          username: trakt_username
+          password: trakt_password
+          apikey: 12345678912345678912345678912345
+          custom: shows i watch
+
+  trakt_input_movies-to-get:
+    # movies i want to see
+    trakt_list:
+      username: trakt_username
+      password: trakt_password
+      apikey: 12345678912345678912345678912345
+      custom: movies to get
+
+  trakt_remove_movies:
+    # remove movies once added to movie-queue
+    trakt_remove:
+      username: trakt_username
+      password: trakt_password
+      apikey: 12345678912345678912345678912345
+      list: movies to get
 
 
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
@@ -61,11 +121,12 @@ tasks:
   rss_btn_my-shows:
     # my list of active shows
     include:
-      - shows.yml
+      #- shows.yml
       - includes/btn_rss_720p-mkv.yml
     template:
       - deluge_connect
       - prowl_master
+      - trakt_input_shows-i-watch
     set:
       # these are used in the prowl_master template in the event and description fields, respectively
       - event: RSS to Deluge
@@ -100,11 +161,12 @@ tasks:
     # premieres I am waiting for, based on my Trakt list premieres,
     # matching against the BTN MKV 720p feed
     include:
-      - includes/trakt_premieres.yml
       - includes/btn_rss_720p-mkv.yml
     template:
       - deluge_connect
       - prowl_master
+      - trakt_input_premieres
+      - trakt_remove_premieres
     set:
       - event: RSS to Deluge
       - pre_desc: 'Now leeching: BTN (my premieres)'
@@ -128,6 +190,8 @@ tasks:
     template:
       - deluge_connect
       - prowl_master
+    series_premiere:
+      allow_teasers: no
     set:
       - event: RSS to Deluge
       - pre_desc: 'Now leeching: BTN (all premieres)'
@@ -139,8 +203,6 @@ tasks:
           render: no
     # here I can use series_premiere because I do want everything, and
     # i'm filtering the output from there
-    series_premiere:
-      allow_teasers: no
     trakt_lookup: yes
     # if these fields aren't present, reject, because i can't filter for
     # them
@@ -148,8 +210,8 @@ tasks:
       - trakt_series_genres
       - trakt_series_network
     if:
-      # if it didn't first air in the last 60 days it's not actually new
-      - trakt_series_first_aired_epoch != None and fromtimestamp(trakt_series_first_aired_epoch) < now - timedelta(days=60): reject
+      # if it didn't start this year, it's not really new. if it's already ended, i don't want to see it
+      - trakt_series_year < 2014 or trakt_series_status == 'Ended': reject
     regexp:
       reject:
         - talk show: {from: trakt_series_genres}
@@ -197,6 +259,7 @@ tasks:
       - path: /media/sdh1/home/tubedogg/tor/1/btn
       - movedone: /media/sdh1/home/tubedogg/tor/2/btn
       - label: btn-1
+      - filename: '{{location|pathbase}}'
       - content_filename:
           value: '{{series_name}} - {{series_id|lower}}'
           render: no
@@ -245,8 +308,7 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username: deluge_user
-      password: deluge_pass
+      username: deluge_user\n      password: deluge_pass
       filter:
         label: btn-1
         state: seeding
@@ -571,6 +633,7 @@ tasks:
     template:
       - deluge_connect
       - prowl_master
+      - move_watch_torrents
     no_entries_ok: yes
     # files from SHD have one of four unique filename structures
     regexp:
@@ -637,9 +700,6 @@ tasks:
     find:
       path: "/Users/tubedogg/Torrents/shd"
       mask: '*.torrent'
-    move:
-      to: "/Users/tubedogg/Torrents/_done"
-      filename: '{{title}}.torrent'
 
 
 ########################################################################
@@ -1006,23 +1066,6 @@ tasks:
 
 
 ########################################################################
-################# MOVIE QUEUE ##########################################
-########################################################################
-
-  # read my trakt "Movies to Get" list and add to movie-queue in flexget
-  movie_queue_from_trakt:
-    include: [ includes/trakt_movies-to-get.yml ]
-    template:
-      - prowl_master
-    set:
-      - event: Trakt to movie-queue
-      - pre_desc: 'Added to movie-queue:'
-    accept_all: yes
-    queue_movies:
-      quality: 720p+ bluray
-
-
-########################################################################
 ################# MANUAL DOWNLOADS #####################################
 ########################################################################
 
@@ -1031,7 +1074,7 @@ tasks:
     manual: yes
     regexp_parse:
       # File to rad
-      source: "/Users/tubedogg/Torrents/URLs.txt"
+      source: "/Users/tubedogg/Torrents/_URLs.txt"
       sections:
         # I use a shell script on the server to output files with the following format (used to be fed directly into
         # aria2):
@@ -1075,6 +1118,23 @@ tasks:
         file-allocation: none
 
 
+########################################################################
+################# MOVIE QUEUE ##########################################
+########################################################################
+
+  # read my trakt "Movies to Get" list and add to movie-queue in flexget
+  movie_queue_from_trakt:
+    template:
+      - prowl_master
+      - trakt_input_movies-to-get
+    set:
+      - event: Trakt to movie-queue
+      - pre_desc: 'Added to movie-queue:'
+    accept_all: yes
+    queue_movies:
+      quality: 720p+ bluray
+
+
 ### TEST ###############################################################
 
   aria_input_test:
@@ -1098,14 +1158,10 @@ schedules:
     interval:
       days: 1
       at_time: 5:00 pm
-  # start BTN downloads every hour
-  - tasks: ['down*btn*']
+  # start BTN downloads every 30 minutes
+  - tasks: ['down*btn*', 'down*tc', 'down*ptp']
     interval:
-      hours: 1
-  # start movie downloads every 3 hours
-  - tasks: ['down*tc', 'down*ptp']
-    interval:
-      hours: 3
+      minutes: 30
   # run TVV and TVT downloads once every 3 days since the trackers
   # are not used as much (by me)
   - tasks: ['down*tv*']
@@ -1115,7 +1171,7 @@ schedules:
   - tasks: ['movie_queue_from_trakt']
     interval:
       days: 2
-  # run watch tasks every hour
+  # run watch tasks every 15 minutes
   - tasks: ['watch*']
     interval:
-      hours: 1
+      minutes: 15
