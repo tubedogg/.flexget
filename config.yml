@@ -308,7 +308,8 @@ tasks:
     from_deluge:
       host: deluge.example.com
       port: 12345
-      username: deluge_user\n      password: deluge_pass
+      username: deluge_user
+      password: deluge_pass
       filter:
         label: btn-1
         state: seeding
@@ -1109,6 +1110,7 @@ tasks:
       # URI of the file to download...use the FTP URL
       uri: '{{url}}'
       fix_year: no
+      exclude_non_content: no
       aria_config:
         # directory to store in locally is included verbatim
         dir: '{{aria2_dir|re_replace("\s\sdir=", "")}}'
@@ -1132,14 +1134,14 @@ tasks:
       - pre_desc: 'Added to movie-queue:'
     accept_all: yes
     queue_movies:
-      quality: 720p+ bluray
+      quality: 720p bluray
 
 
 ### TEST ###############################################################
 
   aria_input_test:
     from_aria2:
-      status: 'complete'
+      status: 'waiting'
 
 
 #*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$##$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*#
